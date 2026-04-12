@@ -144,7 +144,7 @@ export default function CreatePostForm() {
     try {
       await mutation.mutateAsync({
         title: data.get('title') as string,
-        user_id: 'user123',
+        user_id: 'Stiven Valeriano',
         content_blocks: [...],
       });
       router.push('/');

@@ -79,7 +79,7 @@ export function PostEditor() {
 
       await createPostMutation.mutateAsync({
         title,
-        user_id: 'user123',
+        user_id: 'Stiven Valeriano',
         content_blocks: contentBlocks
       })
 
