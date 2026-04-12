@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 9%;
+    --muted-foreground: 0 0% 50%;
+    --accent: 0 0% 9%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 9%;
+    --input: 0 0% 9%;
+    --ring: 0 0% 80%;
     --radius: 0.5rem;
   }
 }
@@ -102,4 +102,22 @@ html.bw .bg-white\/10 { background-color: rgba(0,0,0,0.08) !important; }
 html.bw .ring-white\/5 { --tw-ring-color: rgba(0,0,0,0.05) !important; }
 
 html.bw .bg-gray-950\/80 { background-color: rgba(255,255,255,0.85) !important; }
-html.bw .bg-gray-900\/80 { background-color: rgba(245,245,245,0.9) !important; } 
+html.bw .bg-gray-900\/80 { background-color: rgba(245,245,245,0.9) !important; }
+
+/* Code block styling - theme aware */
+.code-block-wrapper {
+  padding: 0;
+  border: 1px solid #171717;
+  background-color: #0a0a0a;
+}
+
+.code-block-wrapper pre {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+}
+
+html.bw .code-block-wrapper {
+  background-color: #ffffff;
+  border-color: #e4e4e7;
+} 

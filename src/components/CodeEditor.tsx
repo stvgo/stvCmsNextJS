@@ -1,6 +1,7 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useRef, useEffect } from "react"
+import { useTheme } from "next-themes"
 import Editor, { OnMount, BeforeMount } from "@monaco-editor/react"
 import type * as Monaco from 'monaco-editor'
 
@@ -319,6 +320,11 @@ const LANGUAGE_SNIPPETS: Record<string, Array<{label: string, insertText: string
 }
 
 export function CodeEditor({ value, onChange, language, placeholder }: CodeEditorProps) {
+  const { theme } = useTheme()
+  const isLightTheme = theme === 'bw'
+  const editorRef = useRef<Parameters<OnMount>[0] | null>(null)
+  const monacoRef = useRef<Parameters<OnMount>[1] | null>(null)
+
   const handleEditorChange = useCallback((value: string | undefined) => {
     onChange(value ?? "")
   }, [onChange])
@@ -346,6 +352,31 @@ export function CodeEditor({ value, onChange, language, placeholder }: CodeEdito
         'editorLineNumber.activeForeground': '#888888',
         'editorCursor.foreground': '#aeafad',
         'editor.inactiveSelectionBackground': '#3a3d41',
+      },
+    })
+
+    // Define custom light theme for bw mode
+    monaco.editor.defineTheme('custom-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '008000' },
+        { token: 'keyword', foreground: '0000ff' },
+        { token: 'string', foreground: 'a31515' },
+        { token: 'number', foreground: '098658' },
+        { token: 'function', foreground: '795E26' },
+        { token: 'variable', foreground: '001080' },
+        { token: 'type', foreground: '267f99' },
+      ],
+      colors: {
+        'editor.background': '#ffffff',
+        'editor.foreground': '#333333',
+        'editor.lineHighlightBackground': '#f5f5f5',
+        'editor.selectionBackground': '#add6ff',
+        'editorLineNumber.foreground': '#237893',
+        'editorLineNumber.activeForeground': '#0b216f',
+        'editorCursor.foreground': '#000000',
+        'editor.inactiveSelectionBackground': '#e8ebf0',
       },
     })
 
@@ -378,8 +409,12 @@ export function CodeEditor({ value, onChange, language, placeholder }: CodeEdito
   }
 
   const handleEditorMount: OnMount = (editor, monaco) => {
-    // Set custom theme
-    monaco.editor.setTheme('custom-dark')
+    // Store references
+    editorRef.current = editor
+    monacoRef.current = monaco
+
+    // Set appropriate theme based on current theme
+    monaco.editor.setTheme(isLightTheme ? 'custom-light' : 'custom-dark')
     
     // Configure editor settings
     editor.updateOptions({
@@ -414,6 +449,13 @@ export function CodeEditor({ value, onChange, language, placeholder }: CodeEdito
     })
   }
 
+  // Update theme when it changes
+  useEffect(() => {
+    if (monacoRef.current && editorRef.current) {
+      monacoRef.current.editor.setTheme(isLightTheme ? 'custom-light' : 'custom-dark')
+    }
+  }, [isLightTheme])
+
   return (
     <div className="monaco-editor-container relative">
       <Editor
@@ -424,7 +466,7 @@ export function CodeEditor({ value, onChange, language, placeholder }: CodeEdito
         beforeMount={handleBeforeMount}
         onMount={handleEditorMount}
         loading={
-          <div className="flex items-center justify-center h-[200px] bg-[#0a0a0a] text-gray-500 text-sm">
+          <div className={`flex items-center justify-center h-[200px] ${isLightTheme ? 'bg-white text-gray-600' : 'bg-[#0a0a0a] text-gray-500'} text-sm`}>
             Loading editor...
           </div>
         }
@@ -433,7 +475,7 @@ export function CodeEditor({ value, onChange, language, placeholder }: CodeEdito
         }}
       />
       {!value && placeholder && (
-        <div className="absolute top-3 left-14 text-gray-600 text-sm pointer-events-none font-mono">
+        <div className={`absolute top-3 left-14 ${isLightTheme ? 'text-gray-500' : 'text-gray-600'} text-sm pointer-events-none font-mono`}>
           {placeholder}
         </div>
       )}

@@ -20,7 +20,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
 
   return (
     <DashboardLayout>
-      <Card className="bg-gray-900 border-gray-800 text-white">
+      <Card className="border-border">
         <CardHeader>
           <CardTitle>Edit Post</CardTitle>
         </CardHeader>

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { ContentBlock } from '@/types/post';
+import { CodeBlock } from '@/components/CodeBlock';
 
 interface PostPageProps {
   params: Promise<{
@@ -13,15 +14,9 @@ interface PostPageProps {
 function renderContentBlock(block: ContentBlock) {
   switch (block.type) {
     case 'text':
-      return <p className="text-gray-300 whitespace-pre-wrap">{block.content}</p>;
+      return <p className="text-foreground/80 whitespace-pre-wrap">{block.content}</p>;
     case 'code':
-      return (
-        <pre className="bg-gray-800 p-4 rounded-lg overflow-x-auto">
-          <code className={`language-${block.language || 'plaintext'}`}>
-            {block.content}
-          </code>
-        </pre>
-      );
+      return <CodeBlock code={block.content} language={block.language} />;
     case 'images':
       return (
         <img
@@ -60,10 +55,10 @@ export default async function PostPage({ params }: PostPageProps) {
 
   return (
     <DashboardLayout>
-      <Card className="bg-gray-900 border-gray-800 text-white">
+      <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">{post.title}</CardTitle>
-          <div className="text-sm text-gray-400 mt-2">
+          <div className="text-sm text-muted-foreground mt-2">
             <span>By {post.userId}</span>
             <span className="mx-2">•</span>
             <span>{new Date(post.createdAt).toLocaleDateString()}</span>
@@ -77,7 +72,7 @@ export default async function PostPage({ params }: PostPageProps) {
               </div>
             ))
           ) : (
-            <p className="text-gray-500 italic">No content</p>
+            <p className="text-muted-foreground italic">No content</p>
           )}
         </CardContent>
       </Card>
