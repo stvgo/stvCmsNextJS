@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import { useSearch } from "@/contexts/search-context"
+import { useEffect, useState } from "react"
 
 interface HeaderProps {
   setSidebarOpen: (open: boolean) => void
@@ -15,6 +16,11 @@ interface HeaderProps {
 export function Header({ setSidebarOpen }: HeaderProps) {
   const { theme, setTheme } = useTheme()
   const { searchQuery, setSearchQuery, clearSearch, hasActiveSearch } = useSearch()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-border bg-background/80 backdrop-blur-md px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -59,15 +65,17 @@ export function Header({ setSidebarOpen }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-x-4 lg:gap-x-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-            onClick={() => setTheme(theme === "bw" ? "dark" : "bw")}
-            title={theme === "bw" ? "Switch to dark theme" : "Switch to B&W theme"}
-          >
-            {theme === "bw" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-          </Button>
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => setTheme(theme === "bw" ? "dark" : "bw")}
+              title={theme === "bw" ? "Switch to dark theme" : "Switch to B&W theme"}
+            >
+              {theme === "bw" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            </Button>
+          )}
 
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
             <Bell className="h-6 w-6" />
