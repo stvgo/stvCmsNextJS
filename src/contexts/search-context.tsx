@@ -32,8 +32,11 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    // Clear results immediately when starting a new search
+    setSearchResults([])
+    setIsSearching(true)
+
     async function performSearch() {
-      setIsSearching(true)
       try {
         const results = await searchPosts(debouncedSearch)
         setSearchResults(results)
