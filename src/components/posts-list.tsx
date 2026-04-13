@@ -14,12 +14,15 @@ export function PostsList({ posts }: PostsListProps) {
 
   // Use search results when there's an active search
   const displayPosts = hasActiveSearch ? searchResults : posts
-  
-  if (!Array.isArray(displayPosts) || displayPosts.length === 0) {
+
+  // Show "No results found" only when NOT searching and there are no results
+  const showNoResults = !isSearching && (!Array.isArray(displayPosts) || displayPosts.length === 0)
+
+  if (showNoResults) {
     const message = hasActiveSearch
       ? {
           title: "No results found",
-          description: `No posts matching "${searchResults.length === 0 ? "your search" : ""}"`,
+          description: "No posts matching your search",
         }
       : {
           title: "No posts yet",
@@ -28,19 +31,18 @@ export function PostsList({ posts }: PostsListProps) {
 
     return (
       <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-border rounded-lg">
-        {isSearching ? (
-          <>
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mt-4">Searching...</p>
-          </>
-        ) : (
-          <>
-            <h3 className="text-2xl font-bold tracking-tight">{message.title}</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              {hasActiveSearch ? `No posts matching your search` : message.description}
-            </p>
-          </>
-        )}
+        <h3 className="text-2xl font-bold tracking-tight">{message.title}</h3>
+        <p className="text-sm text-muted-foreground mt-2">{message.description}</p>
+      </div>
+    )
+  }
+
+  // Show loading state while searching
+  if (isSearching && hasActiveSearch) {
+    return (
+      <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-border rounded-lg">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <p className="text-sm text-muted-foreground mt-4">Searching...</p>
       </div>
     )
   }

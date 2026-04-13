@@ -30,30 +30,32 @@ export function Header({ setSidebarOpen }: HeaderProps) {
       <div className="h-6 w-px bg-border lg:hidden" />
 
       <div className="flex flex-1 items-center justify-end gap-x-4 self-stretch lg:gap-x-6">
-        <Link href="/post/create">
-          <Button>
-            Create Post
-          </Button>
-        </Link>
-        <div className="relative flex-1 items-center max-w-md">
-          <Search className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-muted-foreground ml-3" />
-          <Input
-            className="block h-full w-full border-0 bg-muted py-0 pl-10 pr-10 text-foreground placeholder:text-muted-foreground focus:ring-0 sm:text-sm"
-            placeholder="Search posts..."
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {hasActiveSearch && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
-              onClick={clearSearch}
-            >
-              <X className="h-4 w-4" />
+        <div className="flex flex-1 items-center gap-x-4 self-stretch">
+          <Link href="/post/create">
+            <Button>
+              Create Post
             </Button>
-          )}
+          </Link>
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-muted-foreground ml-3" />
+            <Input
+              className="block h-full w-full border-0 bg-muted py-0 pl-10 pr-10 text-foreground placeholder:text-muted-foreground focus:ring-0 sm:text-sm"
+              placeholder="Search posts..."
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {hasActiveSearch && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
+                onClick={clearSearch}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-x-4 lg:gap-x-6">
