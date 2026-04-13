@@ -1,0 +1,24 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        background: '#000000',
+        foreground: '#E7E9EA',
+        card: '#16181C',
+        'card-foreground': '#E7E9EA',
+        primary: '#1D9BF0',
+        'primary-foreground': '#FFFFFF',
+        border: '#2F3336',
+        input: '#202327',
+      },
+    },
+  },
+  plugins: [],
+}
+

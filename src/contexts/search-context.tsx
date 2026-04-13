@@ -12,6 +12,7 @@ interface SearchContextType {
   isSearching: boolean
   hasActiveSearch: boolean
   clearSearch: () => void
+  isPending: boolean
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined)
@@ -20,20 +21,21 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<Post[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  
+
   const debouncedSearch = useDebounce(searchQuery, 300)
-  
+
+  // User has typed something
   const hasActiveSearch = searchQuery.trim().length > 0
 
   useEffect(() => {
     if (!debouncedSearch.trim()) {
-      setSearchResults([])
-      setIsSearching(false)
+      if (!searchQuery.trim()) {
+        setSearchResults([])
+        setIsSearching(false)
+      }
       return
     }
 
-    // Clear results immediately when starting a new search
-    setSearchResults([])
     setIsSearching(true)
 
     async function performSearch() {
@@ -66,6 +68,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         isSearching,
         hasActiveSearch,
         clearSearch,
+        isPending: searchQuery !== debouncedSearch && searchQuery.trim().length > 0,
       }}
     >
       {children}

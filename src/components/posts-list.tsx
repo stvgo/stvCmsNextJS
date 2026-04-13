@@ -10,13 +10,13 @@ interface PostsListProps {
 }
 
 export function PostsList({ posts }: PostsListProps) {
-  const { searchResults, isSearching, hasActiveSearch } = useSearch()
+  const { searchResults, isSearching, hasActiveSearch, isPending } = useSearch()
 
   // Use search results when there's an active search
   const displayPosts = hasActiveSearch ? searchResults : posts
 
-  // Show loading state while searching (must come before checking empty results)
-  if (isSearching && hasActiveSearch) {
+  // Show loading state while pending (debouncing) or actively searching
+  if ((isPending || isSearching) && hasActiveSearch) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-border rounded-lg">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -26,23 +26,23 @@ export function PostsList({ posts }: PostsListProps) {
   }
 
   // Show "No results found" only when search is complete and there are no results
-  const showNoResults = !Array.isArray(displayPosts) || displayPosts.length === 0
+  const showNoResults = !isSearching && !isPending && hasActiveSearch && (!Array.isArray(displayPosts) || displayPosts.length === 0)
 
   if (showNoResults) {
-    const message = hasActiveSearch
-      ? {
-          title: "No results found",
-          description: "No posts matching your search",
-        }
-      : {
-          title: "No posts yet",
-          description: "Be the first to start a discussion!",
-        }
-
     return (
       <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-border rounded-lg">
-        <h3 className="text-2xl font-bold tracking-tight">{message.title}</h3>
-        <p className="text-sm text-muted-foreground mt-2">{message.description}</p>
+        <h3 className="text-2xl font-bold tracking-tight">No results found</h3>
+        <p className="text-sm text-muted-foreground mt-2">No posts matching your search</p>
+      </div>
+    )
+  }
+
+  // Show empty state when no posts and no search
+  if (!Array.isArray(posts) || posts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-border rounded-lg">
+        <h3 className="text-2xl font-bold tracking-tight">No posts yet</h3>
+        <p className="text-sm text-muted-foreground mt-2">Be the first to start a discussion!</p>
       </div>
     )
   }
