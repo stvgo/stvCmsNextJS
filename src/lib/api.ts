@@ -137,6 +137,38 @@ export async function createPost(post: CreatePost): Promise<Post> {
 }
 
 /**
+ * Search posts by query term
+ */
+export async function searchPosts(query: string): Promise<Post[]> {
+  logger.api(`Searching posts with query: ${query}`);
+
+  try {
+    const response = await fetchWithTimeout(
+      `${config.api.baseUrl}/post/getPost/${encodeURIComponent(query)}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const data = await handleResponse<unknown>(response);
+
+    // Validate response is an array
+    if (!Array.isArray(data)) {
+      logger.warn('Unexpected API response format for searchPosts, expected array');
+      return [];
+    }
+
+    return data as Post[];
+  } catch (error) {
+    logger.error('Failed to search posts:', error);
+    return [];
+  }
+}
+
+/**
  * Get all posts
  */
 export async function getPosts(): Promise<Post[]> {
@@ -154,7 +186,7 @@ export async function getPosts(): Promise<Post[]> {
     );
 
     const data = await handleResponse<unknown>(response);
-    
+
     // Validate response is an array
     if (!Array.isArray(data)) {
       logger.warn('Unexpected API response format for getPosts, expected array');

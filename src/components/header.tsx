@@ -1,11 +1,12 @@
 "use client"
 
-import { Menu, Bell, Search, Sun, Moon } from "lucide-react"
+import { Menu, Bell, Search, Sun, Moon, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
 import { useTheme } from "next-themes"
+import { useSearch } from "@/contexts/search-context"
 
 interface HeaderProps {
   setSidebarOpen: (open: boolean) => void
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ setSidebarOpen }: HeaderProps) {
   const { theme, setTheme } = useTheme()
+  const { searchQuery, setSearchQuery, clearSearch, hasActiveSearch } = useSearch()
 
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-border bg-background/80 backdrop-blur-md px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -33,13 +35,25 @@ export function Header({ setSidebarOpen }: HeaderProps) {
             Create Post
           </Button>
         </Link>
-        <div className="relative flex-1 items-center">
+        <div className="relative flex-1 items-center max-w-md">
           <Search className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-muted-foreground ml-3" />
           <Input
-            className="block h-full w-full border-0 bg-muted py-0 pl-10 pr-0 text-foreground placeholder:text-muted-foreground focus:ring-0 sm:text-sm"
-            placeholder="Search..."
+            className="block h-full w-full border-0 bg-muted py-0 pl-10 pr-10 text-foreground placeholder:text-muted-foreground focus:ring-0 sm:text-sm"
+            placeholder="Search posts..."
             type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
+          {hasActiveSearch && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
+              onClick={clearSearch}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center gap-x-4 lg:gap-x-6">
