@@ -5,6 +5,8 @@ import { getPosts } from '@/lib/api';
 import { DashboardSkeleton } from '@/components/loading-skeletons';
 import { ErrorBoundary } from '@/components/error-boundary';
 
+export const dynamic = 'force-dynamic';
+
 async function PostsContent() {
   const posts = await getPosts();
   return <PostsList posts={posts} />;
