@@ -1,15 +1,17 @@
 import type { NextConfig } from "next";
 
+const backendUrl = process.env.API_URL || 'http://localhost:8080';
+
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8080/:path*',
+        destination: `${backendUrl}/:path*`,
       },
       {
         source: '/images/:filename*',
-        destination: 'http://localhost:8080/post/image/:filename*',
+        destination: `${backendUrl}/post/image/:filename*`,
       },
     ]
   },
