@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   const url = new URL(`${BACKEND_URL}/post/genTextAI`)
 
   const backendRes = await fetch(url.toString(), {
-    method: 'GET',
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text_ai }),
   })
