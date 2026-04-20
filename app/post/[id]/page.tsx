@@ -14,7 +14,12 @@ interface PostPageProps {
 function renderContentBlock(block: ContentBlock) {
   switch (block.type) {
     case 'text':
-      return <p className="text-foreground/80 whitespace-pre-wrap">{block.content}</p>;
+      return (
+        <div
+          className="prose prose-neutral dark:prose-invert max-w-none text-foreground/80"
+          dangerouslySetInnerHTML={{ __html: block.content }}
+        />
+      );
     case 'code':
       return <CodeBlock code={block.content} language={block.language} />;
     case 'images':

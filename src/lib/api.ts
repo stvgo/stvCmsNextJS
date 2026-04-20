@@ -294,6 +294,30 @@ export async function uploadImage(file: File): Promise<string> {
 }
 
 /**
+ * Generate text content using AI
+ */
+export async function generateTextAI(prompt: string): Promise<string> {
+  logger.api(`Generating AI text for prompt: ${prompt}`);
+
+  const response = await fetchWithTimeout('/api/gen-text', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text_ai: prompt }),
+  })
+
+  if (!response.ok) {
+    throw new ApiError(`Request failed with status ${response.status}`, response.status, response.status)
+  }
+
+  const raw = await response.text()
+  try {
+    return JSON.parse(raw) as string
+  } catch {
+    return raw
+  }
+}
+
+/**
  * Get the full URL for an image
  */
 export function getImageUrl(filename: string): string {

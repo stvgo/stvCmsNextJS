@@ -9,6 +9,7 @@ import { ArrowLeft, Plus, Trash2, Type, Code, Image, Link2 } from "lucide-react"
 import type { ContentBlockType } from "@/types/post"
 import { CodeEditor } from "@/components/CodeEditor"
 import { CMSImage } from "@/components/cms-image"
+import { RichTextEditor } from "@/components/RichTextEditor"
 import { useCreatePost } from "@/hooks/use-post-queries"
 import { useImageUpload } from "@/hooks/use-image-upload"
 import { useRouter } from "next/navigation"
@@ -224,12 +225,9 @@ function ContentBlock({
       </button>
 
       {block.type === 'text' && (
-        <Textarea
+        <RichTextEditor
           value={block.content}
-          onChange={(e) => onUpdate(block.id, { content: e.target.value })}
-          placeholder="Tell your story..."
-          className="w-full min-h-[100px] bg-transparent border-none text-lg text-foreground placeholder:text-muted-foreground resize-none focus:ring-0 p-0"
-          autoFocus
+          onChange={(html) => onUpdate(block.id, { content: html })}
         />
       )}
 

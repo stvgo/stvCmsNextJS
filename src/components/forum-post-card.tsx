@@ -16,9 +16,12 @@ function getExcerpt(post: Post, length: number = 150): string {
   // Find the first text block
   const textBlock = post.contentBlocks.find((block) => block.type === "text");
   if (textBlock) {
-    return textBlock.content.length > length
-      ? textBlock.content.substring(0, length) + "..."
-      : textBlock.content;
+    const plain = textBlock.content
+      .replace(/<\/?(p|h[1-6]|li|br)[^>]*>/gi, ' ')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+    return plain.length > length ? plain.substring(0, length) + "..." : plain
   }
 
   return "Click to view content.";
