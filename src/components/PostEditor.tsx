@@ -5,7 +5,7 @@ import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Plus, Trash2, Type, Code, Image, Link2 } from "lucide-react"
+import { ArrowLeft, Plus, Trash2, Type, Code, Image, Link2, Sparkles, Loader2 } from "lucide-react"
 import type { ContentBlockType } from "@/types/post"
 import { CodeEditor } from "@/components/CodeEditor"
 import { CMSImage } from "@/components/cms-image"
@@ -14,6 +14,8 @@ import { useCreatePost } from "@/hooks/use-post-queries"
 import { useImageUpload } from "@/hooks/use-image-upload"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { generateCodeAI } from "@/lib/api"
+import { Input } from "@/components/ui/input"
 
 interface EditorBlock {
   id: string
@@ -212,6 +214,24 @@ function ContentBlock({
   onRemove: (id: string) => void
 }) {
   const { upload, loading: uploading, previewUrl, filename } = useImageUpload()
+  const [showCodeAI, setShowCodeAI] = useState(false)
+  const [codeAIPrompt, setCodeAIPrompt] = useState('')
+  const [loadingCodeAI, setLoadingCodeAI] = useState(false)
+
+  const handleCodeAIGenerate = async () => {
+    if (!codeAIPrompt.trim()) return
+    setLoadingCodeAI(true)
+    try {
+      const code = await generateCodeAI(codeAIPrompt)
+      onUpdate(block.id, { content: code })
+      setShowCodeAI(false)
+      setCodeAIPrompt('')
+    } catch {
+      toast.error('Failed to generate code')
+    } finally {
+      setLoadingCodeAI(false)
+    }
+  }
 
   return (
     <div className="group relative">
@@ -249,7 +269,49 @@ function ContentBlock({
                 ))}
               </SelectContent>
             </Select>
+            <button
+              type="button"
+              onClick={() => setShowCodeAI(v => !v)}
+              className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${showCodeAI ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground'}`}
+              title="Generate with AI"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              AI
+            </button>
           </div>
+          {showCodeAI && (
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-background">
+              <Input
+                className="h-7 text-xs"
+                placeholder="Describe the code to generate..."
+                value={codeAIPrompt}
+                onChange={(e) => setCodeAIPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleCodeAIGenerate()
+                  if (e.key === 'Escape') { setShowCodeAI(false); setCodeAIPrompt('') }
+                }}
+                autoFocus
+              />
+              <Button
+                type="button"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={handleCodeAIGenerate}
+                disabled={!codeAIPrompt.trim() || loadingCodeAI}
+              >
+                {loadingCodeAI ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Generate'}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs"
+                onClick={() => { setShowCodeAI(false); setCodeAIPrompt('') }}
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
           <CodeEditor
             value={block.content}
             onChange={(value) => onUpdate(block.id, { content: value })}
@@ -273,18 +335,25 @@ function ContentBlock({
                       <p className="mb-2 text-sm text-muted-foreground">
                         <span className="font-semibold">Click to upload</span>
                       </p>
-                      <p className="text-xs text-muted-foreground">SVG, PNG, JPG or GIF</p>
+                      <p className="text-xs text-muted-foreground">JPG, JPEG or PNG</p>
                     </>
                   )}
                 </div>
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/*"
+                  accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                   disabled={uploading}
                   onChange={async (e) => {
                     const file = e.target.files?.[0]
                     if (!file) return
+
+                    const allowed = ['image/jpeg', 'image/png']
+                    if (!allowed.includes(file.type)) {
+                      toast.error('Only JPG, JPEG and PNG files are allowed')
+                      e.target.value = ''
+                      return
+                    }
 
                     const result = await upload(file)
                     if (result) {

@@ -15,14 +15,14 @@ import { validateCreatePost, validateUpdatePost } from "@/validators/post";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type');
-  
+
   // Handle no content responses
   if (response.status === 204 || response.status === 205) {
     return null as T;
   }
 
   let data: unknown;
-  
+
   try {
     if (contentType?.includes('application/json')) {
       data = await response.json();
@@ -294,6 +294,34 @@ export async function uploadImage(file: File): Promise<string> {
 }
 
 /**
+ * Generate code using AI
+ */
+export async function generateCodeAI(prompt: string): Promise<string> {
+  logger.api(`Generating AI code for prompt: ${prompt}`);
+
+  const response = await fetchWithTimeout('/api/post/autoCompleteAI', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code_ai: prompt }),
+  })
+
+  if (!response.ok) {
+    throw new ApiError(`Request failed with status ${response.status}`, response.status, response.status)
+  }
+
+  const raw = await response.text()
+  let result: string
+  try {
+    result = JSON.parse(raw) as string
+  } catch {
+    result = raw
+  }
+
+  // Strip markdown code fences if present
+  return result.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim()
+}
+
+/**
  * Generate text content using AI
  */
 export async function generateTextAI(prompt: string): Promise<string> {
@@ -324,12 +352,12 @@ export function getImageUrl(filename: string): string {
   if (!filename) {
     return '';
   }
-  
+
   // If already a full URL, return as-is
   if (filename.startsWith('http')) {
     return filename;
   }
-  
+
   // Construct the full URL to the backend
   return `${config.api.imageBaseUrl}/post/image/${filename}`;
 }

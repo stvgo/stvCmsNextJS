@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'text_ai is required' }, { status: 400 })
   }
 
-  const url = new URL(`${BACKEND_URL}/post/genTextAI`)
+  const url = new URL(`${BACKEND_URL}/post/autoCompleteAI`)
 
   const backendRes = await fetch(url.toString(), {
     method: 'POST',
