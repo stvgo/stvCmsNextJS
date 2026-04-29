@@ -5,8 +5,9 @@
 
 const requiredServerEnv = [
   // Add required server-side variables here
-  // 'DATABASE_URL',
-  // 'API_SECRET',
+  'AUTH_SECRET',
+  'AUTH_GOOGLE_ID',
+  'AUTH_GOOGLE_SECRET',
 ] as const;
 
 const requiredPublicEnv = [
@@ -46,6 +47,9 @@ export const env = {
   API_URL: process.env.API_URL || 'http://localhost:8080',
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'STV CMS',
   NEXT_PUBLIC_IMAGE_URL: process.env.NEXT_PUBLIC_IMAGE_URL || 'http://localhost:8080',
+  AUTH_SECRET: process.env.AUTH_SECRET || '',
+  AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID || '',
+  AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET || '',
   DEBUG: process.env.DEBUG === 'true',
 } as const;
 

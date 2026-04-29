@@ -2,6 +2,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ReactQueryProvider } from '@/components/providers/react-query-provider';
+import { AuthSessionProvider } from '@/components/session-provider';
 import { validateEnv } from '@/lib/env';
 
 // Validate environment variables at startup
@@ -56,15 +57,17 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
         <ReactQueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            themes={["dark", "bw"]}
-            enableSystem={false}
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+          <AuthSessionProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              themes={["dark", "bw"]}
+              enableSystem={false}
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </AuthSessionProvider>
         </ReactQueryProvider>
       </body>
     </html>

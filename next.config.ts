@@ -18,10 +18,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: `${backendUrl}/:path*`,
-      },
-      {
+        // Image proxy only — API routes now go through /api/proxy route handler
         source: '/images/:filename*',
         destination: `${backendUrl}/post/image/:filename*`,
       },

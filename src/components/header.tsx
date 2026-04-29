@@ -1,6 +1,6 @@
 "use client"
 
-import { Menu, Bell, Search, Sun, Moon, X } from "lucide-react"
+import { Menu, Bell, Search, Sun, Moon, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -8,15 +8,27 @@ import Link from "next/link"
 import { useTheme } from "next-themes"
 import { useSearch } from "@/contexts/search-context"
 import { useEffect, useState } from "react"
+import { useSession, signOut } from "next-auth/react"
 
 interface HeaderProps {
   setSidebarOpen: (open: boolean) => void
+}
+
+function getInitials(name?: string | null): string {
+  if (!name) return "U"
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
 }
 
 export function Header({ setSidebarOpen }: HeaderProps) {
   const { theme, setTheme } = useTheme()
   const { searchQuery, setSearchQuery, clearSearch, hasActiveSearch } = useSearch()
   const [mounted, setMounted] = useState(false)
+  const { data: session } = useSession()
 
   useEffect(() => {
     setMounted(true)
@@ -85,11 +97,25 @@ export function Header({ setSidebarOpen }: HeaderProps) {
 
           <div className="flex items-center gap-x-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="/foto.jpg" />
-              <AvatarFallback className="bg-primary/10 text-primary">SV</AvatarFallback>
+              <AvatarImage src={session?.user?.image || "/foto.jpg"} />
+              <AvatarFallback className="bg-primary/10 text-primary">
+                {getInitials(session?.user?.name)}
+              </AvatarFallback>
             </Avatar>
-            <span className="hidden text-sm font-semibold leading-6 text-foreground lg:block">Stiven Valeriano</span>
+            <span className="hidden text-sm font-semibold leading-6 text-foreground lg:block">
+              {session?.user?.name || "User"}
+            </span>
           </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            title="Sign out"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </div>

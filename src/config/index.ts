@@ -6,10 +6,10 @@
 export const config = {
   /** API Configuration */
   api: {
-    /** Base URL for API requests (uses proxy in browser, direct in SSR) */
-    baseUrl: typeof window === 'undefined' 
+    /** Base URL for API requests (direct SSR, proxied in browser) */
+    baseUrl: typeof window === 'undefined'
       ? (process.env.API_URL || 'http://localhost:8080')
-      : '/api',
+      : '/api/proxy',
     
     /** Base URL for image resources */
     imageBaseUrl: process.env.NEXT_PUBLIC_IMAGE_URL || 'http://localhost:8080',

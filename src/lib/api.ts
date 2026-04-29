@@ -75,7 +75,41 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 /**
- * Fetch wrapper with error handling and timeout
+ * Build auth headers for server-side requests by forwarding the Auth.js session cookie.
+ */
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {}
+  if (typeof window === 'undefined') {
+    try {
+      const { cookies } = await import('next/headers')
+      const cookieStore = await cookies()
+      
+      // Try to find any auth session cookie (Auth.js v5 uses various names)
+      const allCookies = cookieStore.getAll()
+      const sessionCookie = allCookies.find(
+        (c) => c.name.includes('session-token') || c.name.includes('authjs')
+      )
+      
+      if (sessionCookie) {
+        headers['Cookie'] = `${sessionCookie.name}=${sessionCookie.value}`
+        headers['Authorization'] = `Bearer ${sessionCookie.value}`
+        if (process.env.DEBUG === 'true') {
+          console.log(`[AUTH] Forwarding cookie: ${sessionCookie.name}`)
+        }
+      } else if (process.env.DEBUG === 'true') {
+        console.log('[AUTH] No session cookie found. Available:', allCookies.map(c => c.name))
+      }
+    } catch (e) {
+      if (process.env.DEBUG === 'true') {
+        console.log('[AUTH] Failed to read cookies:', e)
+      }
+    }
+  }
+  return headers
+}
+
+/**
+ * Fetch wrapper with error handling, timeout, and auth forwarding.
  */
 async function fetchWithTimeout(
   url: string,
@@ -84,9 +118,17 @@ async function fetchWithTimeout(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), config.api.timeout);
 
+  const authHeaders = await getAuthHeaders();
+  const mergedHeaders = new Headers(options.headers);
+  Object.entries(authHeaders).forEach(([key, value]) => {
+    mergedHeaders.set(key, value);
+  });
+
   try {
     const response = await fetch(url, {
       ...options,
+      headers: mergedHeaders,
+      credentials: 'include',
       signal: controller.signal,
     });
     return response;
