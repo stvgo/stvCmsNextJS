@@ -2,13 +2,13 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ReactQueryProvider } from '@/components/providers/react-query-provider';
-import { AuthSessionProvider } from '@/components/session-provider';
+import { AuthProvider } from '@/contexts/auth-context';
 import { validateEnv } from '@/lib/env';
 
 // Validate environment variables at startup
 validateEnv();
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   preload: true,
@@ -57,7 +57,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
         <ReactQueryProvider>
-          <AuthSessionProvider>
+          <AuthProvider>
             <ThemeProvider
               attribute="class"
               defaultTheme="dark"
@@ -67,7 +67,7 @@ export default function RootLayout({
             >
               {children}
             </ThemeProvider>
-          </AuthSessionProvider>
+          </AuthProvider>
         </ReactQueryProvider>
       </body>
     </html>

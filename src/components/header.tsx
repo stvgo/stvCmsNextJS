@@ -7,8 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import { useSearch } from "@/contexts/search-context"
+import { useAuth } from "@/contexts/auth-context"
 import { useEffect, useState } from "react"
-import { useSession, signOut } from "next-auth/react"
 
 interface HeaderProps {
   setSidebarOpen: (open: boolean) => void
@@ -27,8 +27,8 @@ function getInitials(name?: string | null): string {
 export function Header({ setSidebarOpen }: HeaderProps) {
   const { theme, setTheme } = useTheme()
   const { searchQuery, setSearchQuery, clearSearch, hasActiveSearch } = useSearch()
+  const { user, logout } = useAuth()
   const [mounted, setMounted] = useState(false)
-  const { data: session } = useSession()
 
   useEffect(() => {
     setMounted(true)
@@ -97,13 +97,13 @@ export function Header({ setSidebarOpen }: HeaderProps) {
 
           <div className="flex items-center gap-x-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={session?.user?.image || "/foto.jpg"} />
+              <AvatarImage src={user?.image || "/foto.jpg"} />
               <AvatarFallback className="bg-primary/10 text-primary">
-                {getInitials(session?.user?.name)}
+                {getInitials(user?.name)}
               </AvatarFallback>
             </Avatar>
             <span className="hidden text-sm font-semibold leading-6 text-foreground lg:block">
-              {session?.user?.name || "User"}
+              {user?.name || "User"}
             </span>
           </div>
 
@@ -111,7 +111,7 @@ export function Header({ setSidebarOpen }: HeaderProps) {
             variant="ghost"
             size="sm"
             className="text-muted-foreground hover:text-foreground"
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => logout()}
             title="Sign out"
           >
             <LogOut className="h-5 w-5" />

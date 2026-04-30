@@ -1,7 +1,10 @@
 "use client"
 
-import { signIn } from "next-auth/react"
-import { useSearchParams } from "next/navigation"
+import { useState } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"
+import { useAuth } from "@/contexts/auth-context"
+import { googleLogin } from "@/lib/api"
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -22,27 +25,58 @@ function GitHubIcon({ className }: { className?: string }) {
   )
 }
 
-export function LoginForm() {
+interface LoginFormProps {
+  clientId: string
+}
+
+export function LoginForm({ clientId }: LoginFormProps) {
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const { login } = useAuth()
+  const [error, setError] = useState<string | null>(null)
   const callbackUrl = searchParams.get("callbackUrl") || "/"
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
-      <button
-        onClick={() => signIn("google", { callbackUrl })}
-        className="flex h-11 w-[260px] items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-5 text-sm font-medium text-neutral-800 shadow-sm transition-all hover:border-neutral-300 hover:bg-neutral-50 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 active:scale-[0.98]"
-      >
-        <GoogleIcon className="h-5 w-5 shrink-0" />
-        <span>Continue with Google</span>
-      </button>
+    <GoogleOAuthProvider clientId={clientId}>
+      <div className="flex w-full flex-col items-center gap-3">
+        {error && (
+          <div className="w-[260px] rounded-md bg-red-50 px-3 py-2 text-xs text-red-600">
+            {error}
+          </div>
+        )}
 
-      <button
-        onClick={() => signIn("github", { callbackUrl })}
-        className="flex h-11 w-[260px] items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-5 text-sm font-medium text-neutral-800 shadow-sm transition-all hover:border-neutral-300 hover:bg-neutral-50 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 active:scale-[0.98]"
-      >
-        <GitHubIcon className="h-5 w-5 shrink-0" />
-        <span>Continue with GitHub</span>
-      </button>
-    </div>
+        <div className="w-[260px]">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              setError(null)
+              try {
+                if (!credentialResponse.credential) {
+                  setError("No credential received from Google")
+                  return
+                }
+                const data = await googleLogin(credentialResponse.credential)
+                login(data.token, data.user)
+                router.push(callbackUrl)
+              } catch (err) {
+                console.error("Google login failed:", err)
+                setError("Google login failed. Please try again.")
+              }
+            }}
+            onError={() => {
+              setError("Google login failed. Please try again.")
+            }}
+            width="260"
+          />
+        </div>
+
+        <button
+          disabled
+          className="flex h-11 w-[260px] cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-neutral-100 px-5 text-sm font-medium text-neutral-400 shadow-sm"
+        >
+          <GitHubIcon className="h-5 w-5 shrink-0" />
+          <span>Continue with GitHub</span>
+        </button>
+      </div>
+    </GoogleOAuthProvider>
   )
 }

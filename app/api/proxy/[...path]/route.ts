@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
 
 const backendUrl = process.env.API_URL || "http://localhost:8080"
 
@@ -12,23 +11,14 @@ async function proxy(request: NextRequest, method: string) {
     url.searchParams.set(key, value)
   })
 
-  // Read auth cookie from browser request
-  const cookieStore = await cookies()
-  const sessionToken = cookieStore.get("authjs.session-token")?.value
-
   // Build headers to forward to backend
   const headers = new Headers()
   request.headers.forEach((value, key) => {
-    // Skip host and cookie; we'll set cookie explicitly if present
+    // Skip host and cookie; forward everything else (including Authorization)
     if (key !== "host" && key.toLowerCase() !== "cookie") {
       headers.set(key, value)
     }
   })
-
-  if (sessionToken) {
-    headers.set("Cookie", `authjs.session-token=${sessionToken}`)
-    headers.set("Authorization", `Bearer ${sessionToken}`)
-  }
 
   const body =
     method !== "GET" && method !== "HEAD"

@@ -1,21 +1,21 @@
-import { auth } from "@/auth"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-export default auth((req) => {
+export function middleware(req: NextRequest) {
   const { nextUrl } = req
-  const isAuthenticated = !!req.auth
+  const token = req.cookies.get("stv_token")?.value
+  const isAuthenticated = !!token
   const isLoginPage = nextUrl.pathname === "/login"
-  const isAuthRoute = nextUrl.pathname.startsWith("/api/auth")
+  const isApiRoute = nextUrl.pathname.startsWith("/api")
 
-  // Allow Auth.js internal routes unconditionally
-  if (isAuthRoute) {
+  // Allow API routes unconditionally
+  if (isApiRoute) {
     return NextResponse.next()
   }
 
   // Redirect unauthenticated users to login
   if (!isAuthenticated && !isLoginPage) {
     const loginUrl = new URL("/login", nextUrl.origin)
-    // Preserve the original URL so user can be redirected back after login
     loginUrl.searchParams.set("callbackUrl", nextUrl.pathname + nextUrl.search)
     return NextResponse.redirect(loginUrl)
   }
@@ -28,9 +28,9 @@ export default auth((req) => {
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
-  // Match all paths except static assets, API routes, images, and favicon
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*$).*)"],
+  // Match all paths except static assets, _next internals, images, and favicon
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*$).*)"],
 }

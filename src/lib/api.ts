@@ -75,36 +75,31 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 /**
- * Build auth headers for server-side requests by forwarding the Auth.js session cookie.
+ * Build auth headers: client reads from localStorage, server reads from cookies.
  */
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = {}
-  if (typeof window === 'undefined') {
+
+  if (typeof window !== 'undefined') {
+    // Client-side: read our backend JWT from localStorage
+    const token = localStorage.getItem('stv_token')
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+  } else {
+    // Server-side: try to read from cookies (for SSR if needed)
     try {
       const { cookies } = await import('next/headers')
       const cookieStore = await cookies()
-      
-      // Try to find any auth session cookie (Auth.js v5 uses various names)
-      const allCookies = cookieStore.getAll()
-      const sessionCookie = allCookies.find(
-        (c) => c.name.includes('session-token') || c.name.includes('authjs')
-      )
-      
-      if (sessionCookie) {
-        headers['Cookie'] = `${sessionCookie.name}=${sessionCookie.value}`
-        headers['Authorization'] = `Bearer ${sessionCookie.value}`
-        if (process.env.DEBUG === 'true') {
-          console.log(`[AUTH] Forwarding cookie: ${sessionCookie.name}`)
-        }
-      } else if (process.env.DEBUG === 'true') {
-        console.log('[AUTH] No session cookie found. Available:', allCookies.map(c => c.name))
+      const tokenCookie = cookieStore.get('stv_token')
+      if (tokenCookie) {
+        headers['Authorization'] = `Bearer ${tokenCookie.value}`
       }
-    } catch (e) {
-      if (process.env.DEBUG === 'true') {
-        console.log('[AUTH] Failed to read cookies:', e)
-      }
+    } catch {
+      // ignore
     }
   }
+
   return headers
 }
 
@@ -385,6 +380,26 @@ export async function generateTextAI(prompt: string): Promise<string> {
   } catch {
     return raw
   }
+}
+
+/**
+ * Authenticate with Google credential (ID token)
+ */
+export async function googleLogin(credential: string): Promise<{ token: string; user: { id: number; email: string; name: string; image: string; role: string } }> {
+  logger.api('Google login');
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/auth/google`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ credential }),
+    }
+  );
+
+  return handleResponse(response);
 }
 
 /**

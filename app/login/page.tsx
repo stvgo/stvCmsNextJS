@@ -2,6 +2,8 @@ import { Suspense } from "react"
 import { LoginForm } from "./login-form"
 
 export default function LoginPage() {
+  const clientId = process.env.AUTH_GOOGLE_ID || ""
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-50 px-6">
       <div className="flex w-full max-w-sm flex-col items-center">
@@ -41,7 +43,7 @@ export default function LoginPage() {
               </div>
             }
           >
-            <LoginForm />
+            <LoginForm clientId={clientId} />
           </Suspense>
         </div>
       </div>
