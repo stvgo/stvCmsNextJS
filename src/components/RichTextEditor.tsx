@@ -43,12 +43,16 @@ export function RichTextEditor({ value, onChange, placeholder = 'Tell your story
     setLoadingAI(true)
     try {
       const html = await generateTextAI(aiPrompt)
+      console.log('[RichTextEditor] generateTextAI returned (first 300):', html.substring(0, 300))
+      console.log('[RichTextEditor] html length:', html.length, 'is empty:', !html)
       const clean = html.replace(/>\s*\n+\s*</g, '><').trim()
-      editor.chain().focus().insertContent(clean).run()
+      console.log('[RichTextEditor] clean (first 300):', clean.substring(0, 300))
+      editor.commands.setContent(clean)
       onChange(editor.getHTML())
       setAiPrompt('')
       setShowAI(false)
-    } catch {
+    } catch (err) {
+      console.error('[RichTextEditor] generateTextAI error:', err)
       toast.error('Failed to generate text')
     } finally {
       setLoadingAI(false)
@@ -124,10 +128,10 @@ export function RichTextEditor({ value, onChange, placeholder = 'Tell your story
             ref={inputRef}
             value={aiPrompt}
             onChange={e => setAiPrompt(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') handleAIGenerate()
-              if (e.key === 'Escape') { setShowAI(false); setAiPrompt('') }
-            }}
+onKeyDown={e => {
+               if (e.key === 'Enter') { e.preventDefault(); handleAIGenerate() }
+               if (e.key === 'Escape') { setShowAI(false); setAiPrompt('') }
+             }}
             placeholder="¿Sobre qué quieres escribir?"
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             disabled={loadingAI}

@@ -14,8 +14,8 @@ export const config = {
     /** Base URL for image resources */
     imageBaseUrl: process.env.NEXT_PUBLIC_IMAGE_URL || 'http://localhost:8080',
     
-    /** Request timeout in milliseconds */
-    timeout: Number(process.env.API_TIMEOUT || '10000'),
+    /** Request timeout in milliseconds (AI endpoints can be slow) */
+    timeout: Number(process.env.API_TIMEOUT || '120000'),
     
     /** Number of retry attempts */
     retryAttempts: Number(process.env.API_RETRY_ATTEMPTS || '3'),

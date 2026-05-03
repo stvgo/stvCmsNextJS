@@ -449,6 +449,16 @@ export function CodeEditor({ value, onChange, language, placeholder }: CodeEdito
     })
   }
 
+  // Sync external value changes (e.g. AI generation) into the editor model
+  useEffect(() => {
+    if (editorRef.current) {
+      const current = editorRef.current.getValue()
+      if (value !== current) {
+        editorRef.current.setValue(value)
+      }
+    }
+  }, [value])
+
   // Update theme when it changes
   useEffect(() => {
     if (monacoRef.current && editorRef.current) {

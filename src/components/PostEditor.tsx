@@ -236,10 +236,13 @@ function ContentBlock({
     setLoadingCodeAI(true)
     try {
       const code = await generateCodeAI(codeAIPrompt)
+      console.log('[ContentBlock] generateCodeAI returned (first 300):', code.substring(0, 300))
+      console.log('[ContentBlock] code length:', code.length, 'is empty:', !code)
       onUpdate(block.id, { content: code })
       setShowCodeAI(false)
       setCodeAIPrompt('')
-    } catch {
+    } catch (err) {
+      console.error('[ContentBlock] generateCodeAI error:', err)
       toast.error('Failed to generate code')
     } finally {
       setLoadingCodeAI(false)
@@ -300,7 +303,7 @@ function ContentBlock({
                 value={codeAIPrompt}
                 onChange={(e) => setCodeAIPrompt(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleCodeAIGenerate()
+                  if (e.key === 'Enter') { e.preventDefault(); handleCodeAIGenerate() }
                   if (e.key === 'Escape') { setShowCodeAI(false); setCodeAIPrompt('') }
                 }}
                 autoFocus

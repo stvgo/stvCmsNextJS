@@ -309,6 +309,41 @@ export async function deletePost(id: string): Promise<void> {
 }
 
 /**
+ * Parse AI response text: handles plain text, JSON string, or JSON object with a content key.
+ */
+function parseAIResponse(raw: string): string {
+  console.log('[parseAIResponse] raw input (first 300):', raw.substring(0, 300))
+  try {
+    const parsed = JSON.parse(raw)
+    console.log('[parseAIResponse] JSON parsed, type:', typeof parsed, 'keys:', Object.keys(parsed))
+    if (typeof parsed === 'string') {
+      console.log('[parseAIResponse] returning parsed string (first 200):', parsed.substring(0, 200))
+      return parsed
+    }
+    if (parsed && typeof parsed === 'object') {
+      const contentKeys = ['content', 'html', 'text', 'result', 'data', 'response', 'message', 'output']
+      for (const key of contentKeys) {
+        if (key in parsed && typeof parsed[key] === 'string' && parsed[key].trim()) {
+          console.log(`[parseAIResponse] found content key "${key}" (first 200):`, (parsed[key] as string).substring(0, 200))
+          return parsed[key]
+        }
+      }
+      for (const value of Object.values(parsed)) {
+        if (typeof value === 'string' && value.trim()) {
+          console.log('[parseAIResponse] fallback to first string value (first 200):', value.substring(0, 200))
+          return value
+        }
+      }
+    }
+    console.log('[parseAIResponse] no match, returning String(parsed)')
+    return String(parsed)
+  } catch (e) {
+    console.log('[parseAIResponse] JSON parse failed, returning raw (first 300):', raw.substring(0, 300))
+    return raw
+  }
+}
+
+/**
  * Upload an image file
  */
 export async function uploadImage(file: File): Promise<string> {
@@ -336,23 +371,22 @@ export async function uploadImage(file: File): Promise<string> {
 export async function generateCodeAI(prompt: string): Promise<string> {
   logger.api(`Generating AI code for prompt: ${prompt}`);
 
-  const response = await fetchWithTimeout('/api/post/autoCompleteAI', {
+  const response = await fetchWithTimeout(`${config.api.baseUrl}/post/autoCompleteAI`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code_ai: prompt }),
   })
+
+  console.log('[generateCodeAI] response status:', response.status, 'ok:', response.ok)
 
   if (!response.ok) {
     throw new ApiError(`Request failed with status ${response.status}`, response.status, response.status)
   }
 
   const raw = await response.text()
-  let result: string
-  try {
-    result = JSON.parse(raw) as string
-  } catch {
-    result = raw
-  }
+  console.log('[generateCodeAI] raw response (first 300):', raw.substring(0, 300))
+  const result = parseAIResponse(raw)
+  console.log('[generateCodeAI] parsed result (first 300):', result.substring(0, 300))
 
   // Strip markdown code fences if present
   return result.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim()
@@ -364,22 +398,23 @@ export async function generateCodeAI(prompt: string): Promise<string> {
 export async function generateTextAI(prompt: string): Promise<string> {
   logger.api(`Generating AI text for prompt: ${prompt}`);
 
-  const response = await fetchWithTimeout('/api/gen-text', {
+  const response = await fetchWithTimeout(`${config.api.baseUrl}/post/autoCompleteAI`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text_ai: prompt }),
   })
+
+  console.log('[generateTextAI] response status:', response.status, 'ok:', response.ok)
 
   if (!response.ok) {
     throw new ApiError(`Request failed with status ${response.status}`, response.status, response.status)
   }
 
   const raw = await response.text()
-  try {
-    return JSON.parse(raw) as string
-  } catch {
-    return raw
-  }
+  console.log('[generateTextAI] raw response (first 300):', raw.substring(0, 300))
+  const result = parseAIResponse(raw)
+  console.log('[generateTextAI] parsed result (first 300):', result.substring(0, 300))
+  return result
 }
 
 /**
