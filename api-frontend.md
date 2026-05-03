@@ -37,7 +37,7 @@ Crea un nuevo post.
 {
   "title": "Mi primer post",
   "user_id": "user@example.com",
-  "is_visible": true,
+  "status": "public",
   "content_blocks": [
     {
       "type": "text",
@@ -58,7 +58,7 @@ Crea un nuevo post.
 |---|---|---|---|
 | `title` | string | ✅ | |
 | `user_id` | string | ✅ | Identificador del autor |
-| `is_visible` | boolean | ❌ | Default: `true` |
+| `status` | string | ❌ | `"public"` o `"private"`. Default: `"public"` |
 | `content_blocks` | array | ❌ | Ver tipos abajo |
 
 **Tipos de content block:** `text` · `code` · `image` · `url`
@@ -68,12 +68,12 @@ Crea un nuevo post.
 - `400` → `{ "error": "..." }`
 - `500` → `{ "error": "..." }`
 
-**Nota:** Invalida el caché Redis de posts.
+**Nota:** Posts privados (`status: "private"`) solo son visibles para su autor.
 
 ---
 
 ### `GET /post/getAll`
-Retorna todos los posts. Resultado cacheado 24 horas.
+Retorna los posts visibles para el usuario autenticado. Posts privados de otros autores están excluidos.
 
 **Respuesta `200`:**
 ```json
@@ -84,7 +84,7 @@ Retorna todos los posts. Resultado cacheado 24 horas.
     "updatedAt": "2026-04-20T10:00:00Z",
     "title": "Mi post",
     "userId": "user@example.com",
-    "isVisible": true,
+    "status": "public",
     "contentBlocks": [
       {
         "id": 1,
@@ -147,11 +147,12 @@ Actualiza un post existente.
 |---|---|---|
 | `id` | integer | ✅ |
 | `title` | string | ❌ |
+| `status` | string | ❌ | `"public"` o `"private"` |
 | `content_blocks` | array | ❌ |
 
 **Respuestas:**
 - `200` → `"Post actualizado"`
-- `400` → Body inválido
+- `400` → Body inválido o status inválido
 - `500` → Error interno
 
 **Nota:** Invalida el caché Redis de posts.

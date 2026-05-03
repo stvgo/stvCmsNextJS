@@ -42,12 +42,12 @@ export function LoginForm({ clientId }: LoginFormProps) {
           </div>
         )}
 
-        <div className="relative h-10">
+        <div className="relative inline-flex h-10">
           <div className="flex h-10 items-center justify-center gap-3 border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 whitespace-nowrap">
             <GoogleIcon className="mr-2 h-4 w-4 shrink-0" />
             <span>Continue with Google</span>
           </div>
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-full overflow-hidden opacity-0">
+          <div className="absolute left-0 top-0 h-full w-full overflow-hidden opacity-0">
             <GoogleLogin
               onSuccess={async (credentialResponse) => {
                 setError(null)

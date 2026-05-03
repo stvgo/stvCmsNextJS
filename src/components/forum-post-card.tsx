@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Post } from "@/types/post";
 import { formatDistanceToNow } from "date-fns"; // You might need to install date-fns if not available, or use native Intl
-import { MessageSquare, User, Calendar } from "lucide-react";
+import { MessageSquare, User, Calendar, Lock } from "lucide-react";
 
 interface ForumPostCardProps {
   post: Post;
@@ -45,6 +45,12 @@ export function ForumPostCard({ post }: ForumPostCardProps) {
             <Link href={`/post/${post.id}`} className="hover:underline">
                 <CardTitle className="text-xl font-bold text-primary">{post.title}</CardTitle>
             </Link>
+            {post.status === 'private' && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                <Lock className="w-3 h-3" />
+                Private
+              </span>
+            )}
         </div>
         <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">
           <div className="flex items-center">

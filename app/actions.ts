@@ -19,8 +19,8 @@ export async function createPostAction(data: CreatePost) {
     try {
         await createPostFromApi({
             title: data.title,
-            user_id: data.user_id,
             content_blocks: data.content_blocks,
+            status: data.status,
         });
         revalidatePath('/');
     } catch (error) {

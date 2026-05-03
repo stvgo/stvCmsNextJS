@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Plus, Trash2, Type, Code, Image, Link2, Sparkles, Loader2 } from "lucide-react"
-import type { ContentBlockType } from "@/types/post"
+import type { ContentBlockType, PostStatus } from "@/types/post"
 import { CodeEditor } from "@/components/CodeEditor"
 import { CMSImage } from "@/components/cms-image"
 import { RichTextEditor } from "@/components/RichTextEditor"
@@ -35,6 +35,7 @@ export function PostEditor() {
   const [title, setTitle] = useState("")
   const [blocks, setBlocks] = useState<EditorBlock[]>([])
   const [showAddMenu, setShowAddMenu] = useState(false)
+  const [status, setStatus] = useState<PostStatus>("public")
 
   const addBlock = useCallback((type: ContentBlockType) => {
     const newBlock: EditorBlock = {
@@ -82,8 +83,8 @@ export function PostEditor() {
 
       await createPostMutation.mutateAsync({
         title,
-        user_id: 'Stiven Valeriano',
-        content_blocks: contentBlocks
+        content_blocks: contentBlocks,
+        status,
       })
 
       toast.success('Post published successfully')
@@ -110,13 +111,25 @@ export function PostEditor() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
 
-            <Button
-              type="submit"
-              disabled={createPostMutation.isPending}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"
-            >
-              {createPostMutation.isPending ? 'Publishing...' : 'Publish'}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Select value={status} onValueChange={(v) => setStatus(v as PostStatus)}>
+                <SelectTrigger className="w-[120px] h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="private">Private</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button
+                type="submit"
+                disabled={createPostMutation.isPending}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"
+              >
+                {createPostMutation.isPending ? 'Publishing...' : 'Publish'}
+              </Button>
+            </div>
           </div>
         </div>
       </header>

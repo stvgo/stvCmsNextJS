@@ -5,6 +5,8 @@
 
 export type ContentBlockType = 'text' | 'code' | 'images' | 'urls';
 
+export type PostStatus = 'public' | 'private';
+
 export interface ContentBlock {
   id?: number;
   type: ContentBlockType;
@@ -20,19 +22,21 @@ export interface Post {
   content_blocks: ContentBlock[] | null;
   created_at: string;
   updated_at: string;
-  is_visible: boolean;
+  status: PostStatus;
 }
 
 export interface CreatePost {
   title: string;
-  user_id: string;
+  user_id?: string;
   content_blocks?: ContentBlock[];
+  status?: PostStatus;
 }
 
 export interface UpdatePost {
   id: number;
   title?: string;
   content_blocks?: ContentBlock[];
+  status?: PostStatus;
 }
 
 /**

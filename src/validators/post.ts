@@ -22,15 +22,18 @@ export type ContentBlock = z.infer<typeof contentBlockSchema>;
  * Post Validators
  */
 
+export const postStatusSchema = z.enum(['public', 'private']);
+
+export type PostStatus = z.infer<typeof postStatusSchema>;
+
 export const createPostSchema = z.object({
   title: z.string()
     .min(1, 'Title is required')
     .max(200, 'Title must be less than 200 characters')
     .trim(),
-  user_id: z.string()
-    .min(1, 'User ID is required')
-    .trim(),
+  user_id: z.string().optional(),
   content_blocks: z.array(contentBlockSchema).optional(),
+  status: postStatusSchema.optional(),
 });
 
 export type CreatePost = z.infer<typeof createPostSchema>;
@@ -43,6 +46,7 @@ export const updatePostSchema = z.object({
     .trim()
     .optional(),
   content_blocks: z.array(contentBlockSchema).optional(),
+  status: postStatusSchema.optional(),
 });
 
 export type UpdatePost = z.infer<typeof updatePostSchema>;
@@ -54,6 +58,7 @@ export const postSchema = z.object({
   contentBlocks: z.array(contentBlockSchema).nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  status: postStatusSchema,
 });
 
 export type Post = z.infer<typeof postSchema>;
