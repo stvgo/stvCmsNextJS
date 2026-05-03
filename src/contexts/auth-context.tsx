@@ -8,6 +8,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react"
+import { useRouter } from "next/navigation"
 
 export interface AuthUser {
   id: number
@@ -30,6 +31,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 const STORAGE_KEY = "stv_token"
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter()
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -39,7 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       document.cookie = `${STORAGE_KEY}=; path=/; max-age=0`
     }
     setUser(null)
-  }, [])
+    router.push('/login')
+  }, [router])
 
   const login = useCallback((token: string, userData: AuthUser) => {
     if (typeof window !== "undefined") {

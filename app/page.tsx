@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { PostsList } from '@/components/posts-list';
 import { getPosts } from '@/lib/api';
@@ -13,6 +15,13 @@ async function PostsContent() {
 }
 
 export default async function Dashboard() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('stv_token')?.value;
+
+  if (!token) {
+    redirect('/login');
+  }
+
   const posts = await getPosts();
   const postCount = posts.length;
 
