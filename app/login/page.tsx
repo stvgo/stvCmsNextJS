@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import { LoginForm } from "./login-form"
 
 export default function LoginPage() {
-  const clientId = process.env.AUTH_GOOGLE_ID || ""
+  const clientId = process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID || ""
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white">
