@@ -2,13 +2,13 @@
 
 import { Fragment } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import { FileText, Settings, ImageIcon, X, PenTool } from "lucide-react"
+import { FileText, User, X, PenTool } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { usePathname } from "next/navigation"
 
 const navigation = [
-  { name: "Posts", href: "/", icon: FileText, current: true },
-  { name: "Media", href: "/media", icon: ImageIcon, current: false },
-  { name: "Settings", href: "/settings", icon: Settings, current: false },
+  { name: "Posts", href: "/", icon: FileText },
+  { name: "About Me", href: "/about", icon: User },
 ]
 
 interface SidebarProps {
@@ -66,6 +66,8 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
 }
 
 function SidebarContent() {
+  const pathname = usePathname()
+
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-background px-6 pb-4 border-r border-border">
       <div className="flex h-16 shrink-0 items-center">
@@ -81,20 +83,23 @@ function SidebarContent() {
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           <li>
             <ul role="list" className="-mx-2 space-y-1">
-              {navigation.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className={cn(
-                      item.current ? "bg-secondary text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent",
-                      "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors",
-                    )}
-                  >
-                    <item.icon className="h-6 w-6 shrink-0" />
-                    {item.name}
-                  </a>
-                </li>
-              ))}
+              {navigation.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <li key={item.name}>
+                    <a
+                      href={item.href}
+                      className={cn(
+                        isActive ? "bg-secondary text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                        "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors",
+                      )}
+                    >
+                      <item.icon className="h-6 w-6 shrink-0" />
+                      {item.name}
+                    </a>
+                  </li>
+                )
+              })}
             </ul>
           </li>
         </ul>

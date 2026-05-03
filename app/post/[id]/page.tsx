@@ -1,5 +1,6 @@
 import { getPostById, getImageUrl } from '@/lib/api';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { ContentBlock } from '@/types/post';
@@ -48,7 +49,10 @@ function renderContentBlock(block: ContentBlock) {
 
 export default async function PostPage({ params }: PostPageProps) {
   const { id } = await params;
-  const post = await getPostById(id);
+  const cookieStore = await cookies();
+  const token = cookieStore.get('stv_token')?.value;
+
+  const post = await getPostById(id, { requireAuth: !!token });
 
   if (!post) {
     notFound();
@@ -83,4 +87,4 @@ export default async function PostPage({ params }: PostPageProps) {
       </Card>
     </DashboardLayout>
   );
-} 
+}

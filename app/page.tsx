@@ -1,29 +1,20 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { PostsList } from '@/components/posts-list';
 import { getPosts } from '@/lib/api';
-import { DashboardSkeleton } from '@/components/loading-skeletons';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { Post } from '@/types/post';
 
 export const dynamic = 'force-dynamic';
-
-async function PostsContent() {
-  const posts = await getPosts();
-  return <PostsList posts={posts} />;
-}
 
 export default async function Dashboard() {
   const cookieStore = await cookies();
   const token = cookieStore.get('stv_token')?.value;
 
-  if (!token) {
-    redirect('/login');
-  }
+  const allPosts = await getPosts({ requireAuth: !!token });
 
-  const posts = await getPosts();
-  const postCount = posts.length;
+  const postCount = allPosts.length;
 
   return (
     <DashboardLayout>
@@ -32,7 +23,7 @@ export default async function Dashboard() {
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Posts</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Manage your content
+              {token ? 'Manage your content' : 'Public posts'}
             </p>
           </div>
           <div className="text-sm text-muted-foreground">
@@ -41,11 +32,15 @@ export default async function Dashboard() {
         </div>
 
         <ErrorBoundary>
-          <Suspense fallback={<PostsContent />}>
-            <PostsContent />
+          <Suspense fallback={<PostsContent posts={allPosts} />}>
+            <PostsContent posts={allPosts} />
           </Suspense>
         </ErrorBoundary>
       </div>
     </DashboardLayout>
   );
+}
+
+function PostsContent({ posts }: { posts: Post[] }) {
+  return <PostsList posts={posts} />;
 }

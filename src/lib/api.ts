@@ -207,13 +207,19 @@ export async function searchPosts(query: string): Promise<Post[]> {
 
 /**
  * Get all posts
+ * @param options.requireAuth - If false, uses the public endpoint (no auth required)
  */
-export async function getPosts(): Promise<Post[]> {
+export async function getPosts(options?: { requireAuth?: boolean }): Promise<Post[]> {
+  const requireAuth = options?.requireAuth ?? true;
   logger.api('Fetching all posts');
+
+  const endpoint = requireAuth
+    ? `${config.api.baseUrl}/post/getAll`
+    : `${config.api.baseUrl}/post/getPublic`;
 
   try {
     const response = await fetchWithTimeout(
-      `${config.api.baseUrl}/post/getAll`,
+      endpoint,
       {
         method: 'GET',
         headers: {
@@ -268,12 +274,18 @@ export async function updatePost(post: UpdatePost): Promise<Post> {
 
 /**
  * Get a single post by ID
+ * @param options.requireAuth - If false, uses the public endpoint (no auth required)
  */
-export async function getPostById(id: string): Promise<Post | null> {
+export async function getPostById(id: string, options?: { requireAuth?: boolean }): Promise<Post | null> {
+  const requireAuth = options?.requireAuth ?? true;
   logger.api(`Fetching post: ${id}`);
 
+  const endpoint = requireAuth
+    ? `${config.api.baseUrl}/post/getPost/${id}`
+    : `${config.api.baseUrl}/post/getPublic/${id}`;
+
   const response = await fetchWithTimeout(
-    `${config.api.baseUrl}/post/getPost/${id}`,
+    endpoint,
     {
       method: 'GET',
       headers: {

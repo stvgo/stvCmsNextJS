@@ -11,7 +11,7 @@ import type { CreatePost, UpdatePost } from '@/types/post';
 export function usePosts() {
   return useQuery({
     queryKey: queryKeys.posts.lists(),
-    queryFn: getPosts,
+    queryFn: () => getPosts(),
   });
 }
 
