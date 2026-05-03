@@ -16,10 +16,11 @@ export interface ContentBlock {
 export interface Post {
   id: number;
   title: string;
-  userId: string;
-  contentBlocks: ContentBlock[] | null;
-  createdAt: string;
-  updatedAt: string;
+  user_id: string;
+  content_blocks: ContentBlock[] | null;
+  created_at: string;
+  updated_at: string;
+  is_visible: boolean;
 }
 
 export interface CreatePost {

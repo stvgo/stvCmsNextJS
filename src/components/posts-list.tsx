@@ -47,9 +47,12 @@ export function PostsList({ posts }: PostsListProps) {
     )
   }
   
-  const sortedPosts = [...displayPosts].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
+  const sortedPosts = [...displayPosts].sort((a, b) => {
+    const timeA = new Date(a.created_at).getTime()
+    const timeB = new Date(b.created_at).getTime()
+    if (!isFinite(timeA) || !isFinite(timeB)) return 0
+    return timeB - timeA
+  })
 
   return (
     <div className="space-y-6">

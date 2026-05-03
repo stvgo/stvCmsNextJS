@@ -9,12 +9,12 @@ interface ForumPostCardProps {
 }
 
 function getExcerpt(post: Post, length: number = 150): string {
-  if (!post.contentBlocks || post.contentBlocks.length === 0) {
+  if (!post.content_blocks || post.content_blocks.length === 0) {
     return "No content preview available.";
   }
 
   // Find the first text block
-  const textBlock = post.contentBlocks.find((block) => block.type === "text");
+  const textBlock = post.content_blocks.find((block) => block.type === "text");
   if (textBlock) {
     const plain = textBlock.content
       .replace(/<\/?(p|h[1-6]|li|br)[^>]*>/gi, ' ')
@@ -29,6 +29,9 @@ function getExcerpt(post: Post, length: number = 150): string {
 
 function formatDate(dateString: string) {
     const date = new Date(dateString);
+    if (!isFinite(date.getTime())) {
+        return 'Invalid date';
+    }
     return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
 }
 
@@ -46,11 +49,11 @@ export function ForumPostCard({ post }: ForumPostCardProps) {
         <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">
           <div className="flex items-center">
             <User className="w-4 h-4 mr-1" />
-            <span>{post.userId}</span>
+            <span>{post.user_id}</span>
           </div>
           <div className="flex items-center">
             <Calendar className="w-4 h-4 mr-1" />
-            <span>{formatDate(post.createdAt)}</span>
+            <span>{formatDate(post.created_at)}</span>
           </div>
         </div>
       </CardHeader>

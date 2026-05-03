@@ -54,8 +54,8 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
-  const sortedBlocks = post.contentBlocks
-    ? [...post.contentBlocks].sort((a, b) => a.order - b.order)
+  const sortedBlocks = post.content_blocks
+    ? [...post.content_blocks].sort((a, b) => a.order - b.order)
     : [];
 
   return (
@@ -64,9 +64,9 @@ export default async function PostPage({ params }: PostPageProps) {
         <CardHeader>
           <CardTitle className="text-3xl font-bold">{post.title}</CardTitle>
           <div className="text-sm text-muted-foreground mt-2">
-            <span>By {post.userId}</span>
+            <span>By {post.user_id}</span>
             <span className="mx-2">•</span>
-            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+            <span>{new Date(post.created_at).toLocaleDateString()}</span>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">

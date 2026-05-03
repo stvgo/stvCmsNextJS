@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { updatePostAction } from '../../../actions';
-import type { Post } from '@/types/post';
+import type { Post, ContentBlock } from '@/types/post';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -30,7 +30,7 @@ export function EditPostForm({ post }: EditPostFormProps) {
     await updatePostAction({ 
       id: post.id, 
       title: data.title,
-      content_blocks: post.contentBlocks?.map((block, index) => ({
+      content_blocks: post.content_blocks?.map((block: ContentBlock, index: number) => ({
         type: block.type,
         order: index,
         content: block.content,
@@ -52,7 +52,7 @@ export function EditPostForm({ post }: EditPostFormProps) {
       <div className="space-y-2">
         <Label>Content Blocks</Label>
         <div className="text-sm text-muted-foreground">
-          This post has {post.contentBlocks?.length || 0} content block(s).
+          This post has {post.content_blocks?.length || 0} content block(s).
           Use the PostEditor to edit content blocks.
         </div>
       </div>
