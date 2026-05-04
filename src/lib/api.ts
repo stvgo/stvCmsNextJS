@@ -1,4 +1,5 @@
 import type { CreatePost, Post, UpdatePost } from "@/types/post";
+import type { Project } from "@/types/project";
 import { config } from "@/config";
 import { logger } from "@/lib/logger";
 import {
@@ -464,4 +465,130 @@ export function getImageUrl(filename: string): string {
 
   // Construct the full URL to the backend
   return `${config.api.imageBaseUrl}/post/image/${filename}`;
+}
+
+// ==================== Projects ====================
+
+/**
+ * Get all projects (authenticated)
+ */
+export async function getProjects(options?: { requireAuth?: boolean }): Promise<Project[]> {
+  const requireAuth = options?.requireAuth ?? true;
+  logger.api('Fetching all projects');
+
+  const endpoint = requireAuth
+    ? `${config.api.baseUrl}/project/getAll`
+    : `${config.api.baseUrl}/project/getPublic`;
+
+  try {
+    const response = await fetchWithTimeout(endpoint, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const data = await handleResponse<unknown>(response);
+    if (!Array.isArray(data)) {
+      logger.warn('Unexpected API response format for getProjects');
+      return [];
+    }
+    return data as Project[];
+  } catch (error) {
+    logger.error('Failed to fetch projects:', error);
+    return [];
+  }
+}
+
+/**
+ * Get a single project by ID
+ */
+export async function getProjectById(id: string, options?: { requireAuth?: boolean }): Promise<Project | null> {
+  const requireAuth = options?.requireAuth ?? true;
+  logger.api(`Fetching project: ${id}`);
+
+  const endpoint = requireAuth
+    ? `${config.api.baseUrl}/project/getProject/${id}`
+    : `${config.api.baseUrl}/project/getPublic/${id}`;
+
+  const response = await fetchWithTimeout(endpoint, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  return handleResponse<Project>(response);
+}
+
+/**
+ * Create a new project
+ */
+export async function createProject(data: {
+  title: string;
+  description?: string;
+  type: string;
+  url?: string;
+  embed_url?: string;
+  image_url?: string;
+  github_url?: string;
+  tech_stack?: string;
+}): Promise<{ message: string }> {
+  logger.api(`Creating project: ${data.title}`);
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/project/create`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return handleResponse<{ message: string }>(response);
+}
+
+/**
+ * Update an existing project
+ */
+export async function updateProject(data: {
+  id: number;
+  title?: string;
+  description?: string;
+  type?: string;
+  url?: string;
+  embed_url?: string;
+  image_url?: string;
+  github_url?: string;
+  tech_stack?: string;
+}): Promise<{ message: string }> {
+  logger.api(`Updating project: ${data.id}`);
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/project/update`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }
+  );
+
+  return handleResponse<{ message: string }>(response);
+}
+
+/**
+ * Delete a project by ID
+ */
+export async function deleteProject(id: string): Promise<void> {
+  logger.api(`Deleting project: ${id}`);
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/project/delete/${id}`,
+    {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
+
+  return handleResponse<void>(response);
 }

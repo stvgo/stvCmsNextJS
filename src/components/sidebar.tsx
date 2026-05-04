@@ -2,12 +2,13 @@
 
 import { Fragment } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import { FileText, User, X, PenTool } from "lucide-react"
+import { FileText, User, X, PenTool, FolderKanban } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
 
 const navigation = [
   { name: "Posts", href: "/", icon: FileText },
+  { name: "Projects", href: "/projects", icon: FolderKanban },
   { name: "About Me", href: "/about", icon: User },
 ]
 

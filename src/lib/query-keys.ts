@@ -16,4 +16,12 @@ export const queryKeys = {
     all: ['images'] as const,
     url: (filename: string) => [...queryKeys.images.all, filename] as const,
   },
+  projects: {
+    all: ['projects'] as const,
+    lists: () => [...queryKeys.projects.all, 'list'] as const,
+    list: (filters?: Record<string, unknown>) =>
+      [...queryKeys.projects.lists(), filters] as const,
+    details: () => [...queryKeys.projects.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.projects.details(), id] as const,
+  },
 } as const;
