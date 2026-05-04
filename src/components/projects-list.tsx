@@ -25,7 +25,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
   })
 
   return (
-    <div className="grid gap-6 md:grid-cols-1">
+    <div className="grid gap-6 md:grid-cols-2">
       {sorted.map((project) => (
         <ProjectCard key={project.id} project={project} />
       ))}
