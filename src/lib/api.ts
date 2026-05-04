@@ -1,4 +1,4 @@
-import type { CreatePost, Post, UpdatePost } from "@/types/post";
+import type { CreatePost, Post, UpdatePost, Notification } from "@/types/post";
 import type { Project } from "@/types/project";
 import { config } from "@/config";
 import { logger } from "@/lib/logger";
@@ -591,4 +591,119 @@ export async function deleteProject(id: string): Promise<void> {
   );
 
   return handleResponse<void>(response);
+}
+
+// ==================== Admin Notifications ====================
+
+/**
+ * Get all admin notifications
+ */
+export async function getNotifications(): Promise<Notification[]> {
+  logger.api('Fetching admin notifications');
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/notifications/`,
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+
+  const data = await handleResponse<unknown>(response);
+  if (!Array.isArray(data)) return [];
+  return data as Notification[];
+}
+
+/**
+ * Get unread notification count
+ */
+export async function getUnreadNotificationCount(): Promise<number> {
+  logger.api('Fetching unread notification count');
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/notifications/unread-count`,
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+
+  const data = await handleResponse<{ unread_count: number }>(response);
+  return data.unread_count ?? 0;
+}
+
+/**
+ * Mark a notification as read
+ */
+export async function markNotificationRead(id: string): Promise<void> {
+  logger.api(`Marking notification ${id} as read`);
+
+  await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/notifications/mark-read/${id}`,
+    { method: 'PUT', headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+/**
+ * Mark all notifications as read
+ */
+export async function markAllNotificationsRead(): Promise<void> {
+  logger.api('Marking all notifications as read');
+
+  await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/notifications/mark-all-read`,
+    { method: 'PUT', headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+/**
+ * Delete a notification
+ */
+export async function deleteNotification(id: string): Promise<void> {
+  logger.api(`Deleting notification ${id}`);
+
+  await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/notifications/${id}`,
+    { method: 'DELETE', headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+// ==================== Admin Post Approval ====================
+
+/**
+ * Get pending posts (admin only)
+ */
+export async function getPendingPosts(): Promise<Post[]> {
+  logger.api('Fetching pending posts');
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/post/pending`,
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+
+  const data = await handleResponse<unknown>(response);
+  if (!Array.isArray(data)) return [];
+  return data as Post[];
+}
+
+/**
+ * Approve a post (admin only)
+ */
+export async function approvePost(id: number): Promise<{ message: string }> {
+  logger.api(`Approving post ${id}`);
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/post/approve/${id}`,
+    { method: 'PUT', headers: { 'Content-Type': 'application/json' } }
+  );
+
+  return handleResponse<{ message: string }>(response);
+}
+
+/**
+ * Reject a post (admin only)
+ */
+export async function rejectPost(id: number): Promise<{ message: string }> {
+  logger.api(`Rejecting post ${id}`);
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/post/reject/${id}`,
+    { method: 'DELETE', headers: { 'Content-Type': 'application/json' } }
+  );
+
+  return handleResponse<{ message: string }>(response);
 }

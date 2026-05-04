@@ -2,9 +2,10 @@
 
 import { Fragment } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import { FileText, User, X, PenTool, FolderKanban } from "lucide-react"
+import { FileText, User, X, PenTool, FolderKanban, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 
 const navigation = [
   { name: "Posts", href: "/", icon: FileText },
@@ -68,6 +69,11 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
 
 function SidebarContent() {
   const pathname = usePathname()
+  const { isAdmin } = useAuth()
+
+  const adminNav = isAdmin
+    ? [{ name: "Admin", href: "/admin", icon: Shield }]
+    : []
 
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-background px-6 pb-4 border-r border-border">
@@ -103,6 +109,30 @@ function SidebarContent() {
               })}
             </ul>
           </li>
+          {adminNav.length > 0 && (
+            <li>
+              <div className="text-xs font-semibold leading-6 text-muted-foreground uppercase tracking-wider">Admin</div>
+              <ul role="list" className="-mx-2 mt-2 space-y-1">
+                {adminNav.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <li key={item.name}>
+                      <a
+                        href={item.href}
+                        className={cn(
+                          isActive ? "bg-secondary text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                          "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors",
+                        )}
+                      >
+                        <item.icon className="h-6 w-6 shrink-0" />
+                        {item.name}
+                      </a>
+                    </li>
+                  )
+                })}
+              </ul>
+            </li>
+          )}
         </ul>
       </nav>
     </div>

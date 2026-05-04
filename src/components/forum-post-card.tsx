@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Post } from "@/types/post";
 import { formatDistanceToNow } from "date-fns"; // You might need to install date-fns if not available, or use native Intl
-import { MessageSquare, User, Calendar, Lock } from "lucide-react";
+import { MessageSquare, User, Calendar, Lock, Clock } from "lucide-react";
 
 interface ForumPostCardProps {
   post: Post;
@@ -49,6 +49,12 @@ export function ForumPostCard({ post }: ForumPostCardProps) {
               <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
                 <Lock className="w-3 h-3" />
                 Private
+              </span>
+            )}
+            {post.status === 'pending' && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded">
+                <Clock className="w-3 h-3" />
+                Pending Approval
               </span>
             )}
         </div>

@@ -5,7 +5,7 @@
 
 export type ContentBlockType = 'text' | 'code' | 'images' | 'urls';
 
-export type PostStatus = 'public' | 'private';
+export type PostStatus = 'public' | 'private' | 'pending';;
 
 export interface ContentBlock {
   id?: number;
@@ -81,4 +81,20 @@ export interface PostQueryParams {
   search?: string;
   sortBy?: 'createdAt' | 'updatedAt' | 'title';
   sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * Notification Types
+ */
+
+export interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  post_id: number;
+  author_id: string;
+  author_name: string;
+  read: boolean;
+  created_at: string;
 }

@@ -5,7 +5,7 @@ import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Plus, Trash2, Type, Code, Image, Link2, Sparkles, Loader2 } from "lucide-react"
+import { ArrowLeft, Plus, Trash2, Type, Code, Image, Link2, Sparkles, Loader2, Clock } from "lucide-react"
 import type { ContentBlockType, PostStatus } from "@/types/post"
 import { CodeEditor } from "@/components/CodeEditor"
 import { CMSImage } from "@/components/cms-image"
@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { generateCodeAI } from "@/lib/api"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/contexts/auth-context"
 
 interface EditorBlock {
   id: string
@@ -31,6 +32,7 @@ const LANGUAGES = [
 
 export function PostEditor() {
   const router = useRouter()
+  const { isAdmin } = useAuth()
   const createPostMutation = useCreatePost()
   const [title, setTitle] = useState("")
   const [blocks, setBlocks] = useState<EditorBlock[]>([])
@@ -87,7 +89,13 @@ export function PostEditor() {
         status,
       })
 
-      toast.success('Post published successfully')
+      if (status === 'public' && !isAdmin) {
+        toast.success('Post submitted! It will be visible once the admin approves it.', {
+          icon: <Clock className="h-4 w-4" />,
+        })
+      } else {
+        toast.success('Post published successfully')
+      }
       router.push('/')
     } catch (error) {
       console.error('Failed to create post:', error)
@@ -113,14 +121,25 @@ export function PostEditor() {
 
             <div className="flex items-center gap-3">
               <Select value={status} onValueChange={(v) => setStatus(v as PostStatus)}>
-                <SelectTrigger className="w-[120px] h-9 text-sm">
+                <SelectTrigger className="w-[140px] h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="public">
+                    <span className="flex items-center gap-1.5">
+                      Public
+                      {!isAdmin && <span className="text-[10px] text-amber-500 font-normal">(review)</span>}
+                    </span>
+                  </SelectItem>
                   <SelectItem value="private">Private</SelectItem>
                 </SelectContent>
               </Select>
+              {!isAdmin && status === 'public' && (
+                <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  Requires admin approval
+                </span>
+              )}
 
               <Button
                 type="submit"

@@ -22,6 +22,7 @@ interface AuthContextValue {
   user: AuthUser | null
   isLoading: boolean
   isAuthenticated: boolean
+  isAdmin: boolean
   login: (token: string, user: AuthUser) => void
   logout: () => void
 }
@@ -95,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isLoading,
         isAuthenticated: !!user,
+        isAdmin: user?.email === 'jsvaleriano321@gmail.com',
         login,
         logout,
       }}

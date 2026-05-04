@@ -1,6 +1,7 @@
 "use client"
 
 import { Menu, Bell, Search, Sun, Moon, X, LogOut, LogIn } from "lucide-react"
+import { NotificationBell } from "@/components/notification-bell"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -96,11 +97,7 @@ export function Header({ setSidebarOpen }: HeaderProps) {
             </Button>
           )}
 
-          {isAuthenticated && (
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <Bell className="h-6 w-6" />
-            </Button>
-          )}
+          {isAuthenticated && <NotificationBell />}
 
           <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-border" />
 

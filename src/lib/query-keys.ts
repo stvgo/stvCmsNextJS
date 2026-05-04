@@ -11,6 +11,7 @@ export const queryKeys = {
       [...queryKeys.posts.lists(), filters] as const,
     details: () => [...queryKeys.posts.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.posts.details(), id] as const,
+    pending: () => [...queryKeys.posts.all, 'pending'] as const,
   },
   images: {
     all: ['images'] as const,
@@ -22,6 +23,11 @@ export const queryKeys = {
     list: (filters?: Record<string, unknown>) =>
       [...queryKeys.projects.lists(), filters] as const,
     details: () => [...queryKeys.projects.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.projects.details(), id] as const,
+    detail: (id: string) => [...queryKeys.projects.all, 'detail'] as const,
+  },
+  notifications: {
+    all: ['notifications'] as const,
+    lists: () => [...queryKeys.notifications.all, 'list'] as const,
+    unreadCount: () => [...queryKeys.notifications.all, 'unread-count'] as const,
   },
 } as const;
