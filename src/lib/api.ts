@@ -602,7 +602,7 @@ export async function getNotifications(): Promise<Notification[]> {
   logger.api('Fetching admin notifications');
 
   const response = await fetchWithTimeout(
-    `${config.api.baseUrl}/admin/notifications/`,
+    `${config.api.baseUrl}/admin/notifications`,
     { method: 'GET', headers: { 'Content-Type': 'application/json' } }
   );
 
