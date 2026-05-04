@@ -90,17 +90,15 @@ export function ProjectCard({ project }: ProjectCardProps) {
       )}
 
       {project.embed_url && (
-        <div className="mt-3 rounded-md overflow-hidden border border-border bg-muted/30">
-          <div className="relative aspect-video">
-            <iframe
-              src={project.embed_url}
-              className="absolute inset-0 w-full h-full"
-              title={project.title}
-              sandbox="allow-scripts allow-same-origin"
-              loading="lazy"
-            />
-          </div>
-        </div>
+        <a
+          href={project.embed_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20 transition-colors"
+        >
+          <Gamepad2 className="h-4 w-4" />
+          Play in browser
+        </a>
       )}
 
       {techTags.length > 0 && (

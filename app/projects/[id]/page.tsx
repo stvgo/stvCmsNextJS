@@ -112,16 +112,27 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
               {/* Embed */}
               {project.embed_url && (
-                <div className="rounded-lg overflow-hidden border border-border">
-                  <div className="relative aspect-video bg-muted">
+                <div className="space-y-2">
+                  <div className="rounded-lg overflow-hidden border border-border bg-black">
                     <iframe
                       src={project.embed_url}
-                      className="absolute inset-0 w-full h-full"
+                      className="w-full border-0"
+                      style={{ height: '70vh', minWidth: '320px' }}
                       title={project.title}
-                      sandbox="allow-scripts allow-same-origin"
+                      allow="autoplay; fullscreen; gamepad; clipboard-write"
+                      sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-popups-to-escape-sandbox"
                       loading="lazy"
                     />
                   </div>
+                  <a
+                    href={project.embed_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Open in full screen
+                  </a>
                 </div>
               )}
 
