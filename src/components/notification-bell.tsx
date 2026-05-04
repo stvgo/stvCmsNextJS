@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bell, Check, CheckCheck, Trash2, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Bell, Check, CheckCheck, Trash2, ExternalLink, Loader2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
@@ -16,22 +15,16 @@ import {
 } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import Link from "next/link"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Loader2 } from "lucide-react"
 
 function timeAgo(dateStr: string): string {
   const date = new Date(dateStr)
   const now = new Date()
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-  if (seconds < 60) return "just now"
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-  return `${Math.floor(seconds / 86400)}d ago`
+  if (seconds < 60) return "justo ahora"
+  if (seconds < 3600) return `hace ${Math.floor(seconds / 60)}m`
+  if (seconds < 86400) return `hace ${Math.floor(seconds / 3600)}h`
+  return `hace ${Math.floor(seconds / 86400)}d`
 }
 
 export function NotificationBell() {
@@ -92,128 +85,137 @@ export function NotificationBell() {
   if (!isAdmin) return null
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          className="relative p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-        >
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
-          )}
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[380px] p-0" align="end" sideOffset={8}>
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <h4 className="text-sm font-semibold">Notificaciones</h4>
-          {notifications.length > 0 && (
-            <button
-              type="button"
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-              onClick={() => markAllReadMutation.mutate()}
-              disabled={markAllReadMutation.isPending}
-            >
-              <CheckCheck className="h-3.5 w-3.5" />
-              Marcar todas leídas
-            </button>
-          )}
-        </div>
+    <div className="relative">
+      <button
+        type="button"
+        className="relative p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        onClick={() => setOpen(!open)}
+        aria-label="Notifications"
+      >
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        )}
+      </button>
 
-        <div className="max-h-[360px] overflow-y-auto">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
-              <Bell className="h-8 w-8 mb-2 opacity-40" />
-              <p className="text-sm">Sin notificaciones</p>
-            </div>
-          ) : (
-            <div>
-              {notifications.map((n) => (
-                <div
-                  key={n.id}
-                  className={`px-4 py-3 border-b last:border-b-0 transition-colors hover:bg-accent/50 ${
-                    !n.read ? "bg-primary/5" : ""
-                  }`}
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-[9998]"
+            onClick={() => setOpen(false)}
+          />
+          {/* Panel */}
+          <div className="absolute right-0 top-12 z-[9999] w-[400px] rounded-lg border bg-popover shadow-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h4 className="text-sm font-semibold">Notificaciones</h4>
+              {notifications.length > 0 && (
+                <button
+                  type="button"
+                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  onClick={() => markAllReadMutation.mutate()}
+                  disabled={markAllReadMutation.isPending}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        {!n.read && (
-                          <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
-                        )}
-                        <p className="text-sm font-medium truncate">{n.title}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-0.5 break-words">
-                        {n.message}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground/60 mt-1">
-                        {timeAgo(n.created_at)}
-                      </p>
+                  <CheckCheck className="h-3.5 w-3.5" />
+                  Marcar todas
+                </button>
+              )}
+            </div>
 
-                      {n.type === "post_pending" && (
-                        <div className="flex items-center gap-2 mt-2">
+            <div className="max-h-[360px] overflow-y-auto">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+                  <Bell className="h-8 w-8 mb-2 opacity-40" />
+                  <p className="text-sm">Sin notificaciones</p>
+                </div>
+              ) : (
+                notifications.map((n) => (
+                  <div
+                    key={n.id}
+                    className={`px-4 py-3 border-b last:border-b-0 hover:bg-accent/50 transition-colors ${
+                      !n.read ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          {!n.read && (
+                            <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                          )}
+                          <p className="text-sm font-medium truncate">{n.title}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5 break-words">
+                          {n.message}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground/60 mt-1">
+                          {timeAgo(n.created_at)}
+                        </p>
+
+                        {n.type === "post_pending" && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors disabled:opacity-50"
+                              onClick={() => approveMutation.mutate(n.post_id)}
+                              disabled={approveMutation.isPending}
+                            >
+                              <Check className="h-3 w-3" />
+                              Aprobar
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
+                              onClick={() => rejectMutation.mutate(n.post_id)}
+                              disabled={rejectMutation.isPending}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Rechazar
+                            </button>
+                            <Link
+                              href={`/post/${n.post_id}`}
+                              className="inline-flex items-center gap-1 h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Ver
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col items-center gap-1 shrink-0">
+                        {!n.read && (
                           <button
                             type="button"
-                            className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors disabled:opacity-50"
-                            onClick={() => approveMutation.mutate(n.post_id)}
-                            disabled={approveMutation.isPending}
+                            className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
+                            onClick={() => markReadMutation.mutate(n.id)}
+                            title="Marcar como leída"
                           >
                             <Check className="h-3 w-3" />
-                            Aprobar
                           </button>
-                          <button
-                            type="button"
-                            className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
-                            onClick={() => rejectMutation.mutate(n.post_id)}
-                            disabled={rejectMutation.isPending}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                            Rechazar
-                          </button>
-                          <Link
-                            href={`/post/${n.post_id}`}
-                            className="inline-flex items-center gap-1 h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Ver
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1 shrink-0">
-                      {!n.read && (
+                        )}
                         <button
                           type="button"
-                          className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
-                          onClick={() => markReadMutation.mutate(n.id)}
-                          title="Marcar como leída"
+                          className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-destructive"
+                          onClick={() => deleteMutation.mutate(n.id)}
+                          title="Eliminar"
                         >
-                          <Check className="h-3 w-3" />
+                          <Trash2 className="h-3 w-3" />
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-destructive"
-                        onClick={() => deleteMutation.mutate(n.id)}
-                        title="Eliminar"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
+          </div>
+        </>
+      )}
+    </div>
   )
 }
