@@ -10,8 +10,6 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
   deleteNotification,
-  approvePost,
-  rejectPost,
 } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import Link from "next/link"
@@ -66,29 +64,13 @@ export function NotificationBell() {
     },
   })
 
-  const approveMutation = useMutation({
-    mutationFn: approvePost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
-    },
-  })
-
-  const rejectMutation = useMutation({
-    mutationFn: rejectPost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
-    },
-  })
-
   if (!isAdmin) return null
 
   return (
     <div className="relative">
       <button
         type="button"
-        className="relative p-2 rounded-md text-foreground/70 hover:text-foreground hover:bg-accent transition-colors"
+        className="relative p-2 rounded-md text-foreground hover:bg-accent transition-colors"
         onClick={() => setOpen(!open)}
         aria-label="Notifications"
       >
@@ -108,8 +90,8 @@ export function NotificationBell() {
             onClick={() => setOpen(false)}
           />
           {/* Panel */}
-          <div className="absolute right-0 top-12 z-[9999] w-[400px] rounded-lg border bg-popover shadow-lg overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b">
+          <div className="absolute right-0 top-12 z-[9999] w-[400px] rounded-lg border border-border bg-popover text-popover-foreground shadow-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h4 className="text-sm font-semibold">Notificaciones</h4>
               {notifications.length > 0 && (
                 <button
@@ -138,8 +120,8 @@ export function NotificationBell() {
                 notifications.map((n) => (
                   <div
                     key={n.id}
-                    className={`px-4 py-3 border-b last:border-b-0 hover:bg-accent/50 transition-colors ${
-                      !n.read ? "bg-primary/5" : ""
+                    className={`px-4 py-3 border-b border-border last:border-b-0 hover:bg-accent/50 transition-colors ${
+                      !n.read ? "bg-blue-50 dark:bg-blue-950/20" : ""
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -159,31 +141,49 @@ export function NotificationBell() {
 
                         {n.type === "post_pending" && (
                           <div className="flex items-center gap-2 mt-2">
+                            <Link
+                              href={`/admin/pending/${n.post_id}`}
+                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                              onClick={() => setOpen(false)}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Ver post
+                            </Link>
                             <button
                               type="button"
                               className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors disabled:opacity-50"
-                              onClick={() => approveMutation.mutate(n.post_id)}
-                              disabled={approveMutation.isPending}
+                              onClick={() => {
+                                // Approve then navigate
+                                fetch(`/api/proxy/admin/post/approve/${n.post_id}`, {
+                                  method: "PUT",
+                                  headers: { "Content-Type": "application/json" },
+                                }).then(() => {
+                                  queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
+                                  queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
+                                })
+                              }}
+                              title="Aprobar"
                             >
                               <Check className="h-3 w-3" />
                               Aprobar
                             </button>
                             <button
                               type="button"
-                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
-                              onClick={() => rejectMutation.mutate(n.post_id)}
-                              disabled={rejectMutation.isPending}
+                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
+                              onClick={() => {
+                                fetch(`/api/proxy/admin/post/reject/${n.post_id}`, {
+                                  method: "DELETE",
+                                  headers: { "Content-Type": "application/json" },
+                                }).then(() => {
+                                  queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
+                                  queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
+                                })
+                              }}
+                              title="Rechazar"
                             >
                               <Trash2 className="h-3 w-3" />
                               Rechazar
                             </button>
-                            <Link
-                              href={`/admin`}
-                              className="inline-flex items-center gap-1 h-7 px-2 text-xs text-blue-400 hover:text-blue-300"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              Ver en Admin
-                            </Link>
                           </div>
                         )}
                       </div>
@@ -201,7 +201,7 @@ export function NotificationBell() {
                         )}
                         <button
                           type="button"
-                          className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-destructive"
+                          className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground hover:text-red-500"
                           onClick={() => deleteMutation.mutate(n.id)}
                           title="Eliminar"
                         >

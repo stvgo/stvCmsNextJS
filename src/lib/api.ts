@@ -665,6 +665,20 @@ export async function deleteNotification(id: string): Promise<void> {
 // ==================== Admin Post Approval ====================
 
 /**
+ * Get a pending post by ID (admin only)
+ */
+export async function getPendingPostByID(id: number): Promise<Post> {
+  logger.api(`Fetching pending post ${id}`);
+
+  const response = await fetchWithTimeout(
+    `${config.api.baseUrl}/admin/post/pending/${id}`,
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+
+  return handleResponse<Post>(response);
+}
+
+/**
  * Get pending posts (admin only)
  */
 export async function getPendingPosts(): Promise<Post[]> {

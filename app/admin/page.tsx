@@ -1,13 +1,14 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getPendingPosts, approvePost, rejectPost } from "@/lib/api"
+import { getPendingPosts, approvePost, rejectPost, getPendingPostByID, getImageUrl } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import { Post } from "@/types/post"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, X, Clock, User, Calendar, Loader2 } from "lucide-react"
+import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
@@ -157,6 +158,12 @@ export default function AdminPostsPage() {
                     {getExcerpt(post)}
                   </p>
                   <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/pending/${post.id}`}
+                      className="inline-flex items-center justify-center h-9 px-3 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                    >
+                      Ver contenido
+                    </Link>
                     <Button
                       size="sm"
                       className="bg-green-600 hover:bg-green-700 text-white"
@@ -169,7 +176,7 @@ export default function AdminPostsPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      className="border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                       onClick={() => rejectMutation.mutate(post.id)}
                       disabled={rejectMutation.isPending}
                     >
