@@ -84,12 +84,7 @@ export function NotificationBell() {
 
       {open && (
         <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-[9998]"
-            onClick={() => setOpen(false)}
-          />
-          {/* Panel */}
+          <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-12 z-[9999] w-[400px] rounded-lg border border-border bg-popover text-popover-foreground shadow-lg overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h4 className="text-sm font-semibold">Notificaciones</h4>
@@ -121,7 +116,7 @@ export function NotificationBell() {
                   <div
                     key={n.id}
                     className={`px-4 py-3 border-b border-border last:border-b-0 hover:bg-accent/50 transition-colors ${
-                      !n.read ? "bg-blue-50 dark:bg-blue-950/20" : ""
+                      !n.read ? "bg-blue-500/5" : ""
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -143,7 +138,7 @@ export function NotificationBell() {
                           <div className="flex items-center gap-2 mt-2">
                             <Link
                               href={`/admin/pending/${n.post_id}`}
-                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                               onClick={() => setOpen(false)}
                             >
                               <ExternalLink className="h-3 w-3" />
@@ -151,9 +146,8 @@ export function NotificationBell() {
                             </Link>
                             <button
                               type="button"
-                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors disabled:opacity-50"
+                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
                               onClick={() => {
-                                // Approve then navigate
                                 fetch(`/api/proxy/admin/post/approve/${n.post_id}`, {
                                   method: "PUT",
                                   headers: { "Content-Type": "application/json" },
@@ -169,7 +163,7 @@ export function NotificationBell() {
                             </button>
                             <button
                               type="button"
-                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
+                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md border border-red-400 text-red-600 hover:bg-red-100/60 transition-colors disabled:opacity-50"
                               onClick={() => {
                                 fetch(`/api/proxy/admin/post/reject/${n.post_id}`, {
                                   method: "DELETE",

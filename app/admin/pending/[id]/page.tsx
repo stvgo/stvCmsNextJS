@@ -1,7 +1,7 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
-import { getPendingPostByID, getImageUrl } from "@/lib/api"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { getPendingPostByID, approvePost, rejectPost } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,13 +12,14 @@ import { useAuth } from "@/contexts/auth-context"
 import { useEffect } from "react"
 import { ContentBlock } from "@/types/post"
 import { CodeBlock } from "@/components/CodeBlock"
+import { getImageUrl } from "@/lib/api"
 
 function renderContentBlock(block: ContentBlock) {
   switch (block.type) {
     case "text":
       return (
         <div
-          className="prose prose-neutral dark:prose-invert max-w-none text-foreground/80"
+          className="prose prose-neutral max-w-none text-foreground/80"
           dangerouslySetInnerHTML={{ __html: block.content }}
         />
       )
@@ -38,7 +39,7 @@ function renderContentBlock(block: ContentBlock) {
           href={block.content}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-500 hover:underline"
+          className="text-blue-600 hover:underline"
         >
           {block.content}
         </a>
@@ -52,12 +53,31 @@ export default function PendingPostPage() {
   const { isAdmin, isAuthenticated, isLoading: authLoading } = useAuth()
   const params = useParams()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const id = Number(params.id)
 
   const { data: post, isLoading } = useQuery({
     queryKey: [...queryKeys.posts.pending(), id],
     queryFn: () => getPendingPostByID(id),
     enabled: isAdmin && !!id,
+  })
+
+  const approveMutation = useMutation({
+    mutationFn: approvePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
+      router.push("/admin")
+    },
+  })
+
+  const rejectMutation = useMutation({
+    mutationFn: rejectPost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
+      router.push("/admin")
+    },
   })
 
   useEffect(() => {
@@ -110,15 +130,36 @@ export default function PendingPostPage() {
   return (
     <DashboardLayout>
       <div className="space-y-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Button variant="ghost" size="sm" onClick={() => router.push("/admin")}>
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back
           </Button>
-          <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-500/20">
+          <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-300 px-2.5 py-0.5 text-xs font-medium text-amber-700">
             <Clock className="h-3 w-3 mr-1" />
             Pending Approval
           </span>
+          <div className="flex items-center gap-2 ml-auto">
+            <Button
+              size="sm"
+              className="text-white bg-green-600 hover:bg-green-700"
+              onClick={() => approveMutation.mutate(post.id)}
+              disabled={approveMutation.isPending}
+            >
+              <Check className="h-4 w-4 mr-1" />
+              Approve
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-red-400 text-red-600 hover:bg-red-50"
+              onClick={() => rejectMutation.mutate(post.id)}
+              disabled={rejectMutation.isPending}
+            >
+              <X className="h-4 w-4 mr-1" />
+              Reject
+            </Button>
+          </div>
         </div>
 
         <Card className="border-border">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getPendingPosts, approvePost, rejectPost, getPendingPostByID, getImageUrl } from "@/lib/api"
+import { getPendingPosts, approvePost, rejectPost } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import { Post } from "@/types/post"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -88,7 +88,7 @@ export default function AdminPostsPage() {
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <h2 className="text-2xl font-bold">Access Denied</h2>
           <p className="text-muted-foreground mt-2">
-            You don't have permission to access this page.
+            You don&apos;t have permission to access this page.
           </p>
         </div>
       </DashboardLayout>
@@ -146,7 +146,7 @@ export default function AdminPostsPage() {
                     </div>
                     <Badge
                       variant="outline"
-                      className="text-amber-600 border-amber-500 bg-amber-50 dark:bg-amber-950/30"
+                      className="text-amber-700 border-amber-400 bg-amber-50"
                     >
                       <Clock className="h-3 w-3 mr-1" />
                       Pending
@@ -160,13 +160,13 @@ export default function AdminPostsPage() {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/admin/pending/${post.id}`}
-                      className="inline-flex items-center justify-center h-9 px-3 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                      className="inline-flex items-center justify-center h-9 px-3 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                     >
                       Ver contenido
                     </Link>
                     <Button
                       size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="text-white bg-green-600 hover:bg-green-700"
                       onClick={() => approveMutation.mutate(post.id)}
                       disabled={approveMutation.isPending}
                     >
@@ -176,7 +176,7 @@ export default function AdminPostsPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      className="border-red-400 text-red-600 hover:bg-red-50"
                       onClick={() => rejectMutation.mutate(post.id)}
                       disabled={rejectMutation.isPending}
                     >
