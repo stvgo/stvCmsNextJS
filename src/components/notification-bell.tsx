@@ -135,50 +135,14 @@ export function NotificationBell() {
                         </p>
 
                         {n.type === "post_pending" && (
-                          <div className="flex items-center gap-2 mt-2">
-                            <Link
-                              href={`/admin/pending/${n.post_id}`}
-                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                              onClick={() => setOpen(false)}
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              Ver post
-                            </Link>
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
-                              onClick={() => {
-                                fetch(`/api/proxy/admin/post/approve/${n.post_id}`, {
-                                  method: "PUT",
-                                  headers: { "Content-Type": "application/json" },
-                                }).then(() => {
-                                  queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
-                                  queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
-                                })
-                              }}
-                              title="Aprobar"
-                            >
-                              <Check className="h-3 w-3" />
-                              Aprobar
-                            </button>
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-1 h-7 px-3 text-xs font-medium rounded-md border border-red-400 text-red-600 hover:bg-red-100/60 transition-colors disabled:opacity-50"
-                              onClick={() => {
-                                fetch(`/api/proxy/admin/post/reject/${n.post_id}`, {
-                                  method: "DELETE",
-                                  headers: { "Content-Type": "application/json" },
-                                }).then(() => {
-                                  queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all })
-                                  queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
-                                })
-                              }}
-                              title="Rechazar"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                              Rechazar
-                            </button>
-                          </div>
+                          <Link
+                            href={`/admin/pending/${n.post_id}`}
+                            className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+                            onClick={() => setOpen(false)}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Ver post completo
+                          </Link>
                         )}
                       </div>
 

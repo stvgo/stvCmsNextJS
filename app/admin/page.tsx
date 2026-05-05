@@ -5,7 +5,6 @@ import { getPendingPosts, approvePost, rejectPost } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import { Post } from "@/types/post"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, X, Clock, User, Calendar, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -144,46 +143,22 @@ export default function AdminPostsPage() {
                         </span>
                       </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="text-amber-700 border-amber-400 bg-amber-50"
-                    >
+                    <span className="inline-flex items-center rounded-full border border-amber-400 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
                       <Clock className="h-3 w-3 mr-1" />
                       Pending
-                    </Badge>
+                    </span>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
                     {getExcerpt(post)}
                   </p>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/admin/pending/${post.id}`}
-                      className="inline-flex items-center justify-center h-9 px-3 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                    >
-                      Ver contenido
-                    </Link>
-                    <Button
-                      size="sm"
-                      className="text-white bg-green-600 hover:bg-green-700"
-                      onClick={() => approveMutation.mutate(post.id)}
-                      disabled={approveMutation.isPending}
-                    >
-                      <Check className="h-4 w-4 mr-1" />
-                      Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-red-400 text-red-600 hover:bg-red-50"
-                      onClick={() => rejectMutation.mutate(post.id)}
-                      disabled={rejectMutation.isPending}
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Reject
-                    </Button>
-                  </div>
+                  <Link
+                    href={`/admin/pending/${post.id}`}
+                    className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Ver contenido
+                  </Link>
                 </CardContent>
               </Card>
             ))}

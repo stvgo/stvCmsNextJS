@@ -5,7 +5,6 @@ import { getPendingPostByID, approvePost, rejectPost } from "@/lib/api"
 import { queryKeys } from "@/lib/query-keys"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { ArrowLeft, Check, X, Clock, Loader2 } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { useAuth } from "@/contexts/auth-context"
@@ -114,10 +113,13 @@ export default function PendingPostPage() {
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <h2 className="text-2xl font-bold">Post not found</h2>
-          <Button variant="outline" className="mt-4" onClick={() => router.push("/admin")}>
+          <button
+            className="mt-4 inline-flex items-center rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+            onClick={() => router.push("/admin")}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Admin
-          </Button>
+          </button>
         </div>
       </DashboardLayout>
     )
@@ -131,34 +133,34 @@ export default function PendingPostPage() {
     <DashboardLayout>
       <div className="space-y-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/admin")}>
+          <button
+            className="inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+            onClick={() => router.push("/admin")}
+          >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back
-          </Button>
-          <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-300 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+          </button>
+          <span className="inline-flex items-center rounded-full border border-amber-400 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
             <Clock className="h-3 w-3 mr-1" />
             Pending Approval
           </span>
           <div className="flex items-center gap-2 ml-auto">
-            <Button
-              size="sm"
-              className="text-white bg-green-600 hover:bg-green-700"
+            <button
+              className="inline-flex items-center justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors disabled:opacity-50"
               onClick={() => approveMutation.mutate(post.id)}
               disabled={approveMutation.isPending}
             >
               <Check className="h-4 w-4 mr-1" />
               Approve
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-red-400 text-red-600 hover:bg-red-50"
+            </button>
+            <button
+              className="inline-flex items-center justify-center rounded-md border border-red-400 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
               onClick={() => rejectMutation.mutate(post.id)}
               disabled={rejectMutation.isPending}
             >
               <X className="h-4 w-4 mr-1" />
               Reject
-            </Button>
+            </button>
           </div>
         </div>
 
