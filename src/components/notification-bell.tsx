@@ -88,7 +88,7 @@ export function NotificationBell() {
     <div className="relative">
       <button
         type="button"
-        className="relative p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        className="relative p-2 rounded-md text-foreground/70 hover:text-foreground hover:bg-accent transition-colors"
         onClick={() => setOpen(!open)}
         aria-label="Notifications"
       >
@@ -178,11 +178,11 @@ export function NotificationBell() {
                               Rechazar
                             </button>
                             <Link
-                              href={`/post/${n.post_id}`}
-                              className="inline-flex items-center gap-1 h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                              href={`/admin`}
+                              className="inline-flex items-center gap-1 h-7 px-2 text-xs text-blue-400 hover:text-blue-300"
                             >
                               <ExternalLink className="h-3 w-3" />
-                              Ver
+                              Ver en Admin
                             </Link>
                           </div>
                         )}

@@ -6,6 +6,7 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { ContentBlock } from '@/types/post';
 import { CodeBlock } from '@/components/CodeBlock';
 
+
 interface PostPageProps {
   params: Promise<{
     id: string;
@@ -52,7 +53,18 @@ export default async function PostPage({ params }: PostPageProps) {
   const cookieStore = await cookies();
   const token = cookieStore.get('stv_token')?.value;
 
-  const post = await getPostById(id, { requireAuth: !!token });
+  // Try authenticated fetch first, fall back to public
+  let post = null;
+  try {
+    post = await getPostById(id, { requireAuth: !!token });
+  } catch {
+    // If authenticated fails, try public
+    try {
+      post = await getPostById(id, { requireAuth: false });
+    } catch {
+      notFound();
+    }
+  }
 
   if (!post) {
     notFound();
@@ -66,7 +78,14 @@ export default async function PostPage({ params }: PostPageProps) {
     <DashboardLayout>
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">{post.title}</CardTitle>
+          <div className="flex items-center gap-3">
+            <CardTitle className="text-3xl font-bold">{post.title}</CardTitle>
+            {post.status === 'pending' && (
+              <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-500 border border-amber-500/20">
+                Pendiente
+              </span>
+            )}
+          </div>
           <div className="text-sm text-muted-foreground mt-2">
             <span>By {post.user_id}</span>
             <span className="mx-2">•</span>
