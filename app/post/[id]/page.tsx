@@ -105,7 +105,7 @@ export default async function PostPage({ params }: PostPageProps) {
           )}
         </CardContent>
       </Card>
-      <PostActionsWrapper postId={post.id} />
+      <PostActionsWrapper postId={post.id} postUserId={post.user_id} />
     </DashboardLayout>
   );
 }

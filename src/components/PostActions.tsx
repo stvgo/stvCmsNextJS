@@ -25,19 +25,25 @@ import Link from 'next/link';
 
 interface PostActionsProps {
   postId: string;
+  postUserId: string;
 }
 
-export function PostActions({ postId }: PostActionsProps) {
+export function PostActions({ postId, postUserId }: PostActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
+
+  const canEdit = isAdmin || (user?.name === postUserId);
 
   const handleDelete = async () => {
     await deletePostAction(postId);
     setIsDeleteDialogOpen(false);
   };
 
-  // Only show action menu to admins (edit is visible to all for now)
-  // Delete is admin-only
+  // Only show actions to users who can edit or admins
+  if (!canEdit && !isAdmin) {
+    return null;
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -47,12 +53,14 @@ export function PostActions({ postId }: PostActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-gray-800 border-gray-700">
-          <DropdownMenuItem asChild className="text-gray-300 hover:text-white hover:bg-gray-700 cursor-pointer">
-            <Link href={`/post/${postId}/edit`}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Link>
-          </DropdownMenuItem>
+          {canEdit && (
+            <DropdownMenuItem asChild className="text-gray-300 hover:text-white hover:bg-gray-700 cursor-pointer">
+              <Link href={`/post/${postId}/edit`}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
+            </DropdownMenuItem>
+          )}
           {isAdmin && (
             <DropdownMenuItem
               className="text-red-400 hover:text-red-300 hover:bg-gray-700 cursor-pointer"
