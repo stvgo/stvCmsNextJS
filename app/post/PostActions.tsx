@@ -3,6 +3,7 @@
 import { deletePostAction } from "../actions";
 import Link from "next/link";
 import { useTransition } from "react";
+import { useAuth } from "@/contexts/auth-context";
 
 type PostActionsProps = {
   postId: number;
@@ -10,6 +11,7 @@ type PostActionsProps = {
 
 export default function PostActions({ postId }: PostActionsProps) {
   const [isPending, startTransition] = useTransition();
+  const { isAdmin } = useAuth();
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -24,13 +26,15 @@ export default function PostActions({ postId }: PostActionsProps) {
       <Link href={`/post/${postId}/edit`} className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-bold">
         Edit
       </Link>
-      <button
-        onClick={handleDelete}
-        disabled={isPending}
-        className="bg-red-600 text-white px-4 py-2 rounded-md font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isPending ? 'Deleting...' : 'Delete'}
-      </button>
+      {isAdmin && (
+        <button
+          onClick={handleDelete}
+          disabled={isPending}
+          className="bg-red-600 text-white px-4 py-2 rounded-md font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isPending ? 'Deleting...' : 'Delete'}
+        </button>
+      )}
     </div>
   );
-} 
+}

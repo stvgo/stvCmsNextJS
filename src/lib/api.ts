@@ -305,11 +305,14 @@ export async function getPostById(id: string, options?: { requireAuth?: boolean 
 /**
  * Delete a post by ID
  */
+/**
+ * Delete a post by ID (admin only)
+ */
 export async function deletePost(id: string): Promise<void> {
-  logger.api(`Deleting post: ${id}`);
+  logger.api(`Deleting post (admin): ${id}`);
 
   const response = await fetchWithTimeout(
-    `${config.api.baseUrl}/post/delete/${id}`,
+    `${config.api.baseUrl}/admin/post/delete/${id}`,
     {
       method: 'DELETE',
       headers: {

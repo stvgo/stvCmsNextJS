@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { deletePostAction } from '../../app/actions';
+import { useAuth } from '@/contexts/auth-context';
 import Link from 'next/link';
 
 interface PostActionsProps {
@@ -28,12 +29,15 @@ interface PostActionsProps {
 
 export function PostActions({ postId }: PostActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { isAdmin } = useAuth();
 
   const handleDelete = async () => {
     await deletePostAction(postId);
     setIsDeleteDialogOpen(false);
   };
 
+  // Only show action menu to admins (edit is visible to all for now)
+  // Delete is admin-only
   return (
     <>
       <DropdownMenu>
@@ -49,13 +53,15 @@ export function PostActions({ postId }: PostActionsProps) {
               Edit
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            className="text-red-400 hover:text-red-300 hover:bg-gray-700 cursor-pointer"
-            onSelect={() => setIsDeleteDialogOpen(true)}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
+          {isAdmin && (
+            <DropdownMenuItem
+              className="text-red-400 hover:text-red-300 hover:bg-gray-700 cursor-pointer"
+              onSelect={() => setIsDeleteDialogOpen(true)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -75,4 +81,4 @@ export function PostActions({ postId }: PostActionsProps) {
       </AlertDialog>
     </>
   );
-} 
+}
