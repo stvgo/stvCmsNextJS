@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { ContentBlock } from '@/types/post';
 import { CodeBlock } from '@/components/CodeBlock';
+import PostActionsWrapper from './PostActionsWrapper';
 
 
 interface PostPageProps {
@@ -104,6 +105,7 @@ export default async function PostPage({ params }: PostPageProps) {
           )}
         </CardContent>
       </Card>
+      <PostActionsWrapper postId={post.id} />
     </DashboardLayout>
   );
 }
