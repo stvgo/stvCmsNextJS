@@ -78,8 +78,11 @@ export function LoginForm({ clientId }: LoginFormProps) {
         </div>
 
         <button
-          disabled
-          className="flex h-10 cursor-not-allowed items-center justify-center gap-3 border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900"
+          onClick={() => {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+            window.location.href = `${apiUrl}/auth/github`
+          }}
+          className="flex h-10 w-full cursor-pointer items-center justify-center gap-3 border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50"
         >
           <GitHubIcon className="mr-2 h-4 w-4 shrink-0" />
           <span>Continue with GitHub</span>
